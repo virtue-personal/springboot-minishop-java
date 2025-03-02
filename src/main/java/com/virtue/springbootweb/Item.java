@@ -1,18 +1,22 @@
 package com.virtue.springbootweb;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
-@ToString
 @Entity
+@Getter
+@Setter
+@ToString
 public class Item {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long id;
+    private Long id;
 
     @Column
-    public String title;
+    private String title;
 
     @Column
-    public Integer price;
+    private Integer price;
 
 }
