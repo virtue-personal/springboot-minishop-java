@@ -24,6 +24,12 @@ dependencies {
 	// devtools
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
+	// jpa
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+	// mysql
+	runtimeOnly 'com.mysql:mysql-connector-j'
+
 	// thymeleaf
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
