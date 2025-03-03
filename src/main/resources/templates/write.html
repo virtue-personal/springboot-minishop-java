@@ -9,10 +9,12 @@
     <link href="/main.css" rel="stylesheet">
 </head>
 <body>
-<form action="/add" method="post">
-    <input name="title">
-    <input name="price">
-    <button type="submit">전송</button>
-</form>
+    <div th:replace="~{ nav.html::navbar }"></div>
+
+    <form action="/add" method="post">
+        <input name="title">
+        <input name="price">
+        <button type="submit">전송</button>
+    </form>
 </body>
 </html>
