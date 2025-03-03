@@ -6,6 +6,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @Controller
@@ -67,6 +69,12 @@ public class ItemController {
 
         itemService.editItem(id, title, price);
 
+        return "redirect:/list";
+    }
+
+    @PostMapping("/test1")
+    String test(@RequestBody Map<String, Object> body) {
+        System.out.println(body.get("name"));
         return "redirect:/list";
     }
 }
