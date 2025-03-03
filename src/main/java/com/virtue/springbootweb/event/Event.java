@@ -1,4 +1,4 @@
-package com.virtue.springbootweb;
+package com.virtue.springbootweb.event;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

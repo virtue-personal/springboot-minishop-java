@@ -1,4 +1,4 @@
-package com.virtue.springbootweb;
+package com.virtue.springbootweb.item;
 
 import jakarta.persistence.*;
 import lombok.Getter;

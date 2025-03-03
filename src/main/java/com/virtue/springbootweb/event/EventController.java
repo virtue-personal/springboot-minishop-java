@@ -1,4 +1,4 @@
-package com.virtue.springbootweb;
+package com.virtue.springbootweb.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;

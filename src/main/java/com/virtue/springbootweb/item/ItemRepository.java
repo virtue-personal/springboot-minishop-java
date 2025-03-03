@@ -1,4 +1,4 @@
-package com.virtue.springbootweb;
+package com.virtue.springbootweb.item;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
