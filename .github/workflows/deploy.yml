@@ -51,6 +51,6 @@ jobs:
           port: 22
           script: |
             cd /home/ec2-user/yt_codingapple_springbootweb
-            docker compose down || true
-            docker compose --env-file .env up -d --build
+            docker-compose down || true
+            docker-compose --env-file .env up -d --build
             echo "Deployment complete!"
