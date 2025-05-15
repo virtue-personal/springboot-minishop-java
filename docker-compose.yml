@@ -1,0 +1,35 @@
+services:
+  yt_codingapple_springbootweb:
+    image: yt_codingapple_springbootweb
+    container_name: yt_codingapple_springbootweb
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "10002:10002"
+    depends_on:
+      - mysql
+    env_file:
+      - .env
+    networks:
+      - backend
+  
+  mysql:
+    container_name: mysql
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
+
+volumes: 
+  mysql-data:
