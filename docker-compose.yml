@@ -1,7 +1,7 @@
 services:
   springboot:
-    image: yt_codingapple_springbootweb
-    container_name: yt_codingapple_springbootweb
+    image: yt-codingapple-springbootweb
+    container_name: yt-codingapple-springbootweb
     build:
       context: .
       dockerfile: Dockerfile
