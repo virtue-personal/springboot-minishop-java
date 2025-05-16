@@ -1,12 +1,13 @@
 package com.virtue.springbootweb.item;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -16,13 +17,18 @@ public class ItemController {
 
     private final ItemRepository itemRepository;
     private final ItemService itemService;
+    private final S3Service s3Service;
 
+    // 페이지 없는 기본 요청은 1페이지로 redirect
     @GetMapping("/list")
-    String list(Model model) {
-        List<Item> result = itemRepository.findAll();
+    String listRedirect() {
+        return "redirect:/list/1";
+    }
 
+    @GetMapping("/list/{pageNum}")
+    String getListPage(Model model, @PathVariable Integer pageNum) {
+        Page<Item> result = itemRepository.findPageBy(PageRequest.of(pageNum - 1, 6));
         model.addAttribute("items", result);
-
         return "list.html";
     }
 
@@ -32,10 +38,10 @@ public class ItemController {
     }
 
     @PostMapping("/add")
-    String add(@RequestParam String title,
-               @RequestParam Integer price) {
-
-        itemService.saveItem(title, price);
+    public String addItem(@RequestParam String title,
+                          @RequestParam Integer price,
+                          @RequestParam(required = false) String img) {
+        itemService.saveItem(title, price, img);
         return "redirect:/list";
     }
 
@@ -48,7 +54,6 @@ public class ItemController {
         } else {
             return "redirect:/list";
         }
-
     }
 
     @GetMapping("/edit/{id}")
@@ -65,16 +70,9 @@ public class ItemController {
     @PostMapping("/edit")
     String editItem(@RequestParam Long id,
                     @RequestParam String title,
-                    @RequestParam Integer price) {
-
-        itemService.editItem(id, title, price);
-
-        return "redirect:/list";
-    }
-
-    @PostMapping("/test1")
-    String test(@RequestBody Map<String, Object> body) {
-        System.out.println(body.get("name"));
+                    @RequestParam Integer price,
+                    @RequestParam(required = false) String img) {
+        itemService.editItem(id, title, price, img);
         return "redirect:/list";
     }
 
@@ -82,5 +80,19 @@ public class ItemController {
     ResponseEntity<String> deleteItem(@RequestParam Long id) {
         itemRepository.deleteById(id);
         return ResponseEntity.status(200).body("삭제완료");
+    }
+
+    @GetMapping("/presigned-url")
+    @ResponseBody
+    String getURL(@RequestParam String filename) {
+        var result = s3Service.createPresignedUrl("test/" + filename);
+        System.out.println(result);
+        return result;
+    }
+
+    @PostMapping("/test1")
+    String test(@RequestBody Map<String, Object> body) {
+        System.out.println(body.get("name"));
+        return "redirect:/list";
     }
 }

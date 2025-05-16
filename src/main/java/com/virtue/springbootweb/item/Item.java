@@ -19,4 +19,7 @@ public class Item {
     @Column
     private Integer price;
 
+    @Column
+    private String imgUrl;
+
 }
