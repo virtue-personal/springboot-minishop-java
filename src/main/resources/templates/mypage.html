@@ -9,16 +9,13 @@
     <link href="/main.css" rel="stylesheet">
 </head>
 <body>
-    <div th:replace="~{ nav.html::navbar }"></div>
+<div th:replace="~{ nav.html::navbar }"></div>
 
-    <h4>마이페이지임</h4>
+<h4>마이페이지임</h4>
 
-    <div sec:authentication="principal"></div>
-    <div sec:authentication="principal.username"></div>
-<!--    <div sec:authentication="hasAuthority('일반유저')">-->
-<!--        <h4>이 유저는 일반유저 권한임</h4>-->
-<!--    </div>-->
-
+<span sec:authentication="principal"></span>
+<span sec:authentication="principal.username"></span>
+<span sec:authentication="principal.authorities"></span>
 
 </body>
 </html>
