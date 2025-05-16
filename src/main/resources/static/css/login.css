@@ -1,0 +1,268 @@
+@import 'common.css';
+
+.login-wrapper {
+    min-height: calc(100vh - 72px); /* navbar 높이를 제외 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 2.5rem;
+}
+
+.login-card {
+    border: none;
+    border-radius: 1.2rem;
+    background-color: var(--bs-body-bg);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    transform: translateY(-72px/2); /* navbar 높이의 절반만큼 위로 이동 */
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-bs-theme="dark"] .login-card {
+    background-color: rgba(var(--bs-body-bg-rgb), 0.95);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25);
+}
+
+.login-card-header {
+    background-color: transparent;
+    border-bottom: 1px solid var(--bs-border-color);
+    padding: 2rem 2rem 1.5rem;
+}
+
+.login-card-body {
+    padding: 2rem;
+}
+
+.login-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    text-align: center;
+    background: linear-gradient(45deg, var(--bs-primary) 0%, var(--bs-info) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.login-subtitle {
+    color: var(--bs-secondary);
+    font-size: 0.875rem;
+    text-align: center;
+    margin-bottom: 0;
+}
+
+.form-control {
+    border-color: var(--bs-border-color);
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+    padding: 1rem;
+    font-size: 1rem;
+}
+
+.form-control:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 4px 8px rgba(var(--bs-primary-rgb), 0.15);
+}
+
+.form-control::placeholder {
+    color: var(--bs-secondary);
+}
+
+.remember-forgot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 1rem 0;
+}
+
+.remember-me {
+    color: #495057;
+}
+
+.forgot-password {
+    color: #0d6efd;
+    text-decoration: none;
+    font-size: 0.875rem;
+}
+
+.forgot-password:hover {
+    color: #0a58ca;
+    text-decoration: underline;
+}
+
+.btn-login {
+    padding: 0.75rem;
+    font-weight: 500;
+    background: linear-gradient(45deg, var(--bs-primary) 0%, var(--bs-info) 100%);
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(var(--bs-primary-rgb), 0.15);
+    background: linear-gradient(45deg, var(--bs-info) 0%, var(--bs-primary) 100%);
+}
+
+.register-link {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--bs-border-color);
+}
+
+.register-text {
+    color: var(--bs-secondary);
+    font-size: 0.875rem;
+    margin-bottom: 0;
+}
+
+.register-link a {
+    color: var(--bs-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.register-link a:hover {
+    color: var(--bs-info);
+    text-decoration: none;
+    transform: translateX(3px);
+    display: inline-block;
+}
+
+/* 애니메이션 효과 */
+.login-card {
+    animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px - 72px/2);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(-72px/2);
+    }
+}
+
+.login-header {
+    @apply text-center space-y-2;
+}
+
+.login-header h2 {
+    @apply text-3xl font-extrabold text-gray-900;
+    background: linear-gradient(to right, var(--primary), var(--primary-dark));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.login-header p {
+    @apply text-sm text-gray-600;
+}
+
+.login-form {
+    @apply mt-8 space-y-6;
+}
+
+.form-group {
+    @apply space-y-4 rounded-xl shadow-sm;
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.form-group label {
+    @apply block text-sm font-medium text-gray-700 mb-1;
+}
+
+.form-group input {
+    @apply appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 rounded-lg;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary focus:z-10;
+    @apply transition-all duration-200 ease-in-out;
+}
+
+.form-group input:hover {
+    @apply border-primary/50;
+}
+
+.checkbox-group {
+    @apply flex items-center justify-between mt-4;
+}
+
+.checkbox-wrapper {
+    @apply flex items-center;
+}
+
+.checkbox-wrapper input[type="checkbox"] {
+    @apply h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded;
+    @apply transition-all duration-200 ease-in-out;
+}
+
+.checkbox-wrapper label {
+    @apply ml-2 block text-sm text-gray-900;
+}
+
+.login-button {
+    @apply group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-semibold;
+    @apply rounded-lg text-white bg-gradient-to-r from-primary to-primary-dark;
+    @apply hover:from-primary-dark hover:to-primary;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary;
+    @apply transition-all duration-200 ease-in-out transform hover:-translate-y-0.5;
+}
+
+.login-button span {
+    @apply absolute left-0 inset-y-0 flex items-center pl-3;
+}
+
+.login-button svg {
+    @apply h-5 w-5 text-white/80 group-hover:text-white;
+    @apply transition-all duration-200 ease-in-out;
+}
+
+.error-message {
+    @apply rounded-lg bg-red-50 p-4 mb-6;
+    @apply border border-red-100;
+    @apply animate-fade-in;
+}
+
+.error-message .flex {
+    @apply items-start;
+}
+
+.error-message .error-icon {
+    @apply h-5 w-5 text-red-400 mt-0.5;
+}
+
+.error-message .error-text {
+    @apply text-sm text-red-700;
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(-0.5rem);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fade-in 0.2s ease-out;
+}
+
+/* 알림 메시지 스타일 */
+.alert {
+    border: none;
+    background: rgba(var(--bs-danger-rgb), 0.1);
+    border-left: 4px solid var(--bs-danger);
+} 
