@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -33,11 +34,13 @@ public class ItemController {
     }
 
     @GetMapping("/write")
+    @PreAuthorize("isAuthenticated()")
     String write() {
         return "write.html";
     }
 
     @PostMapping("/add")
+    @PreAuthorize("isAuthenticated()")
     public String addItem(@RequestParam String title,
                           @RequestParam Integer price,
                           @RequestParam(required = false) String img) {
@@ -57,6 +60,7 @@ public class ItemController {
     }
 
     @GetMapping("/edit/{id}")
+    @PreAuthorize("isAuthenticated()")
     String edit(Model model, @PathVariable Long id) {
         Optional<Item> result = itemRepository.findById(id);
         if (result.isPresent()) {
@@ -68,6 +72,7 @@ public class ItemController {
     }
 
     @PostMapping("/edit")
+    @PreAuthorize("isAuthenticated()")
     String editItem(@RequestParam Long id,
                     @RequestParam String title,
                     @RequestParam Integer price,
@@ -77,6 +82,7 @@ public class ItemController {
     }
 
     @DeleteMapping("/item")
+    @PreAuthorize("isAuthenticated()")
     ResponseEntity<String> deleteItem(@RequestParam Long id) {
         itemRepository.deleteById(id);
         return ResponseEntity.status(200).body("삭제완료");
