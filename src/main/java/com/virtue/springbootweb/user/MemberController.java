@@ -34,7 +34,7 @@ public class MemberController {
         return "login";
     }
 
-    @GetMapping("/my-page")
+    @GetMapping("/mypage")
     public String myPage(Authentication auth) {
         CustomUser result = (CustomUser) auth.getPrincipal();
         return "mypage";

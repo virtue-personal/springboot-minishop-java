@@ -56,12 +56,28 @@
             </div>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/login">로그인</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/register">회원가입</a>
-                    </li>
+                    <th:block sec:authorize="!isAuthenticated()">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/login">로그인</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/register">회원가입</a>
+                        </li>
+                    </th:block>
+                    <th:block sec:authorize="isAuthenticated()">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/mypage">
+                                <i class="bi bi-person-circle me-1"></i>마이페이지
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <form th:action="@{/logout}" method="post" class="d-inline">
+                                <button type="submit" class="btn nav-link text-danger">
+                                    <i class="bi bi-box-arrow-right me-1"></i>로그아웃
+                                </button>
+                            </form>
+                        </li>
+                    </th:block>
                 </ul>
             </div>
         </div>
