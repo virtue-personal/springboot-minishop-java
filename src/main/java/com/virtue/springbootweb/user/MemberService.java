@@ -14,16 +14,24 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
 
     public void saveUser(String username, String password, String displayName) throws Exception {
-
+        // 아이디 중복 체크
         Optional<Member> result = memberRepository.findByUsername(username);
-        if (result.isPresent()){
-            throw new Exception("존재하는아이디");
+        if (result.isPresent()) {
+            throw new Exception("이미 사용중인 아이디입니다.");
         }
 
-
-        if (username.length() < 8 || password.length() < 8){
-            throw new Exception("너무짧음");
+        // 입력값 유효성 검사
+        if (displayName == null || displayName.trim().length() == 0 || displayName.length() > 5) {
+            throw new Exception("이름은 1-5자 사이로 입력해주세요.");
         }
+        if (username == null || username.length() < 5 || username.length() > 20) {
+            throw new Exception("아이디는 5-20자 사이로 입력해주세요.");
+        }
+        if (password == null || password.length() < 8 || password.length() > 16) {
+            throw new Exception("비밀번호는 8-16자 사이로 입력해주세요.");
+        }
+
+        // 회원 정보 저장
         Member member = new Member();
         member.setUsername(username);
         member.setPassword(passwordEncoder.encode(password));

@@ -3,8 +3,10 @@ package com.virtue.springbootweb.user;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
@@ -15,22 +17,28 @@ public class MemberController {
     private final MemberRepository memberRepository;
 
     @GetMapping("/register")
-    public String register() {
+    public String register(Model model) {
         return "register";
     }
 
-    @PostMapping("/member")
-    public String addMember(String username, String password, String displayName) {
+    @PostMapping("/register")
+    public String register(String username, String password, String displayName, Model model) {
         try {
             memberService.saveUser(username, password, displayName);
             return "redirect:/login";
         } catch (Exception e) {
-            return "redirect:/register?error=true";
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("username", username);
+            model.addAttribute("displayName", displayName);
+            return "register";
         }
     }
 
     @GetMapping("/login")
-    public String login() {
+    public String login(
+            @RequestParam(value = "error", required = false) String error,
+            @RequestParam(value = "exception", required = false) String exception,
+            Model model) {
         return "login";
     }
 
