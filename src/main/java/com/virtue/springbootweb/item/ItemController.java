@@ -21,7 +21,6 @@ public class ItemController {
     private final ItemService itemService;
     private final S3Service s3Service;
 
-    // 페이지 없는 기본 요청은 1페이지로 redirect
     @GetMapping("/list")
     String listRedirect() {
         return "redirect:/list/1";
@@ -61,10 +60,15 @@ public class ItemController {
     }
 
     @GetMapping("/detail/{id}")
-    String detail(@PathVariable Long id, Model model) {
+    String detail(@PathVariable Long id, 
+                 @RequestParam(required = false, defaultValue = "1") Integer page,
+                 @RequestParam(required = false, defaultValue = "desc") String sort,
+                 Model model) {
         Optional<Item> result = itemRepository.findById(id);
         if (result.isPresent()) {
             model.addAttribute("data", result.get());
+            model.addAttribute("page", page);
+            model.addAttribute("sort", sort);
             return "detail.html";
         } else {
             return "redirect:/list";

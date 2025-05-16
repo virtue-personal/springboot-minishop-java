@@ -141,7 +141,7 @@
                 <div class="row g-4" th:if="${!items.empty}">
                     <div class="col-md-4" th:each="item : ${items.content}">
             <div class="card h-100">
-                            <a th:href="@{/detail/{id}(id=${item.id})}" class="card-link">
+                            <a th:href="@{/detail/{id}(id=${item.id}, page=${items.number + 1}, sort=${currentSort})}" class="card-link">
                                 <img th:src="${item.imgUrl != null and !item.imgUrl.isEmpty()} ? ${item.imgUrl} : 'https://placehold.co/300'"
                                      class="card-img-top" th:alt="${item.title}">
                 <div class="card-body d-flex flex-column">

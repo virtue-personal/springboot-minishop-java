@@ -1,6 +1,69 @@
 <div class="nav" th:fragment="navbar">
-    <a class="logo">SpringMall</a>
-    <a href="/list">List</a>
-    <a href="/write">Write</a>
-    <a href="/event">Event</a>
+    <div class="nav-left">
+        <a href="/" class="logo">SpringMall</a>
+        <a href="/list">상품목록</a>
+        <a href="/write" sec:authorize="isAuthenticated()">상품등록</a>
+        <a href="/event">이벤트</a>
+    </div>
+    <div class="nav-right">
+        <div sec:authorize="!isAuthenticated()">
+            <a href="/login" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-box-arrow-in-right me-1"></i>로그인
+            </a>
+            <a href="/register" class="btn btn-primary btn-sm ms-2">
+                <i class="bi bi-person-plus me-1"></i>회원가입
+            </a>
+        </div>
+        <div sec:authorize="isAuthenticated()" class="d-flex align-items-center">
+            <span class="me-3 text-body" sec:authentication="principal.displayName">사용자</span>
+            <form th:action="@{/logout}" method="post" class="d-inline">
+                <button type="submit" class="btn btn-outline-danger btn-sm">
+                    <i class="bi bi-box-arrow-right me-1"></i>로그아웃
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        .nav {
+            padding: 1rem 2rem;
+            background-color: var(--bs-body-bg);
+            border-bottom: 1px solid var(--bs-border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: var(--bs-body-color);
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .nav a:not(.btn):hover {
+            color: var(--bs-primary);
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--bs-primary) !important;
+        }
+
+        .text-body {
+            color: var(--bs-body-color) !important;
+        }
+    </style>
 </div>

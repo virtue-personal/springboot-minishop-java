@@ -117,7 +117,7 @@
                 </div>
                 
                 <div class="back-button-container">
-                    <a href="/list" class="btn btn-back">
+                    <a th:href="@{/list/{page}(page=${page}, sort=${sort})}" class="btn btn-back">
                         목록으로 돌아가기
                     </a>
                 </div>

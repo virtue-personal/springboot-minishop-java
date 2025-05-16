@@ -7,24 +7,34 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>쇼핑몰 - 메인</title>
+    <title>쇼핑몰</title>
     <th:block th:fragment="customCss">
         <style>
-            .main-wrapper {
+            .hero-section {
+                padding: 5rem 0;
                 min-height: calc(100vh - 72px);
                 display: flex;
                 align-items: center;
-                justify-content: center;
-                padding: 2rem;
             }
 
-            .main-container {
-                width: 100%;
-                max-width: 1200px;
-                margin: 0 auto;
+            .hero-title {
+                font-size: 3rem;
+                font-weight: 700;
+                margin-bottom: 1.5rem;
+                color: var(--bs-body-color);
+            }
+
+            .hero-subtitle {
+                font-size: 1.25rem;
+                color: var(--bs-secondary-color);
+                margin-bottom: 2rem;
             }
 
             .feature-card {
+                padding: 2rem;
+                border-radius: 1rem;
+                background-color: var(--bs-body-bg);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
                 height: 100%;
                 transition: transform 0.3s ease;
             }
@@ -34,93 +44,100 @@
             }
 
             .feature-icon {
-                font-size: 2rem;
-                margin-bottom: 1rem;
-                color: var(--bs-primary);
-            }
-
-            .welcome-section {
-                text-align: center;
-                margin-bottom: 4rem;
-            }
-
-            .welcome-title {
                 font-size: 2.5rem;
-                font-weight: 700;
+                color: var(--bs-primary);
                 margin-bottom: 1rem;
-                background: linear-gradient(45deg, var(--bs-primary) 0%, var(--bs-info) 100%);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                background-clip: text;
             }
 
-            .welcome-subtitle {
-                font-size: 1.2rem;
-                color: var(--bs-secondary);
-                margin-bottom: 2rem;
+            .feature-title {
+                font-size: 1.5rem;
+                font-weight: 600;
+                margin-bottom: 1rem;
+            }
+
+            .feature-description {
+                color: var(--bs-secondary-color);
+                margin-bottom: 1.5rem;
+            }
+
+            [data-bs-theme="dark"] .feature-card {
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
             }
         </style>
     </th:block>
 </head>
 <body>
     <th:block th:fragment="content">
-        <div class="main-wrapper">
-            <div class="main-container">
-                <div class="welcome-section">
-                    <h1 class="welcome-title">쇼핑몰에 오신 것을 환영합니다</h1>
-                    <p class="welcome-subtitle">최고의 상품과 서비스로 여러분을 모시겠습니다</p>
-                    <div class="d-flex gap-2 justify-content-center">
-                        <a href="/list" class="btn btn-primary">
-                            <i class="bi bi-shop me-2"></i>쇼핑하기
-                        </a>
-                        <a href="/event" class="btn btn-info text-white">
-                            <i class="bi bi-gift me-2"></i>이벤트
-                        </a>
-                        <a href="/register" class="btn btn-outline-primary" sec:authorize="!isAuthenticated()">
-                            <i class="bi bi-person-plus me-2"></i>회원가입
-                        </a>
+        <section class="hero-section">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-8 mx-auto text-center">
+                        <h1 class="hero-title">쇼핑몰에 오신 것을 환영합니다</h1>
+                        <p class="hero-subtitle">다양한 상품을 둘러보고 나만의 상품을 등록해보세요</p>
+                        
+                        <!-- 비로그인 상태일 때 -->
+                        <div sec:authorize="!isAuthenticated()" class="d-flex justify-content-center gap-3">
+                            <a href="/login" class="btn btn-primary btn-lg">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>로그인하기
+                            </a>
+                            <a href="/register" class="btn btn-outline-primary btn-lg">
+                                <i class="bi bi-person-plus me-2"></i>회원가입
+                            </a>
+                        </div>
+                        
+                        <!-- 로그인 상태일 때 -->
+                        <div sec:authorize="isAuthenticated()" class="d-flex justify-content-center gap-3">
+                            <a href="/write" class="btn btn-primary btn-lg">
+                                <i class="bi bi-plus-lg me-2"></i>상품 등록하기
+                            </a>
+                            <a href="/list" class="btn btn-outline-primary btn-lg">
+                                <i class="bi bi-shop me-2"></i>상품 둘러보기
+                            </a>
+                        </div>
                     </div>
                 </div>
 
-                <div class="row g-4">
-                    <div class="col-md-4">
-                        <div class="card feature-card">
-                            <div class="card-body text-center">
-                                <div class="feature-icon">
-                                    <i class="bi bi-truck"></i>
-                                </div>
-                                <h3 class="card-title h5">아마도 빠른 배송</h3>
-                                <p class="card-text text-muted">주문 후 최대 2일 이내 배송 완료</p>
+                <!-- 기능 소개 카드 -->
+                <div class="row mt-5 g-4">
+                    <div class="col-md-6">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="bi bi-shop"></i>
+                            </div>
+                            <h3 class="feature-title">상품 등록</h3>
+                            <p class="feature-description">
+                                로그인 후 자유롭게 상품을 등록할 수 있습니다.
+                                이미지, 가격, 제목을 설정하여 나만의 상품을 등록해보세요.
+                            </p>
+                            <div sec:authorize="!isAuthenticated()">
+                                <a href="/login" class="btn btn-outline-primary">로그인하고 시작하기</a>
+                            </div>
+                            <div sec:authorize="isAuthenticated()">
+                                <a href="/write" class="btn btn-outline-primary">상품 등록하기</a>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="col-md-4">
-                        <div class="card feature-card">
-                            <div class="card-body text-center">
-                                <div class="feature-icon">
-                                    <i class="bi bi-shield-check"></i>
-                                </div>
-                                <h3 class="card-title h5">50% 확률 정품 보증</h3>
-                                <p class="card-text text-muted">모든 상품 정품 인증 보장 불가</p>
+                    <div class="col-md-6">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="bi bi-pencil-square"></i>
                             </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-4">
-                        <div class="card feature-card">
-                            <div class="card-body text-center">
-                                <div class="feature-icon">
-                                    <i class="bi bi-headset"></i>
-                                </div>
-                                <h3 class="card-title h5">고객 지원</h3>
-                                <p class="card-text text-muted">안 바쁠 때 문의하세요</p>
+                            <h3 class="feature-title">상품 관리</h3>
+                            <p class="feature-description">
+                                등록한 상품을 언제든지 수정하고 삭제할 수 있습니다.
+                                상품 정보를 최신으로 유지하세요.
+                            </p>
+                            <div sec:authorize="!isAuthenticated()">
+                                <a href="/login" class="btn btn-outline-primary">로그인하고 관리하기</a>
+                            </div>
+                            <div sec:authorize="isAuthenticated()">
+                                <a href="/list" class="btn btn-outline-primary">상품 관리하기</a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
     </th:block>
 
     <th:block th:fragment="customJs"></th:block>
