@@ -45,6 +45,9 @@ dependencies {
 	// swagger
 	implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.3.0'
 
+	// s3
+	implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:3.1.1'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
