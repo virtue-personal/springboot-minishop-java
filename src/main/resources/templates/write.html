@@ -3,22 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+          content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Item 등록</title>
     <link href="/main.css" rel="stylesheet">
 </head>
 <body>
+<!-- 네비게이션 -->
 <div th:replace="~{ nav.html::navbar }"></div>
-<!-- csrf 설정
-<input type="hidden"
-       th:name="${_csrf.parameterName}"
-       th:value="${_csrf.token}">
--->
+
+<!-- 폼 -->
 <form action="/add" method="POST">
-    <input name="title">
-    <input name="price">
+    <input type="text" name="title" placeholder="제목"><br>
+    <input type="number" name="price" placeholder="가격"><br>
+
+    <!-- 이미지 업로드 결과를 저장하는 hidden 필드 -->
+    <input type="hidden" name="img">
+
     <button type="submit">전송</button>
 </form>
+
+<!-- 이미지 업로드 -->
+<input type="file" onchange="getURL(this)">
+<img src="" style="width: 300px; height: auto; margin-top: 10px;">
+
+<script>
+    async function getURL(e) {
+        let file = e.files[0];
+        let name = encodeURIComponent(file.name);
+
+        // presigned URL 요청
+        let result = await fetch('/presigned-url?filename=' + name);
+        let uploadUrl = await result.text();
+
+        // 실제 파일 업로드
+        let uploadResult = await fetch(uploadUrl, {
+            method: 'PUT',
+            body: file
+        });
+
+        // 결과 처리
+        if (uploadResult.ok) {
+            let imageUrl = uploadUrl.split("?")[0];
+            document.querySelector('img').src = imageUrl;
+            document.querySelector('input[name="img"]').value = imageUrl; // 폼에 저장
+            console.log("업로드 성공:", imageUrl);
+        } else {
+            alert("이미지 업로드 실패");
+        }
+    }
+</script>
+
 </body>
 </html>
