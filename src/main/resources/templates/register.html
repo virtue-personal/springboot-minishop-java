@@ -1,19 +1,119 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/default :: layout(~{::title}, ~{::content}, ~{::customCss}, ~{::customJs})}">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <link href="/main.css" rel="stylesheet">
+    <title>회원가입 - 쇼핑몰</title>
+    <th:block th:fragment="customCss">
+        <link rel="stylesheet" th:href="@{/css/login.css}">
+    </th:block>
 </head>
 <body>
-<div th:replace="~{ nav.html::navbar }"></div>
-
-<h4>새로 가입해도 쿠폰안줌</h4>
-<form action="/member" method="POST">
-    <input name="displayName" placeholder="이름">
-    <input name="username" placeholder="아이디">
-    <input name="password" type="password" placeholder="비밀번호">
-    <button type="submit">전송</button>
-</form>
+    <th:block th:fragment="content">
+        <div class="login-wrapper">
+            <div class="container">
+                <div class="login-container">
+                    <div class="card login-card">
+                        <div class="login-card-header">
+                            <h2 class="login-title">회원가입</h2>
+                            <p class="login-subtitle">쇼핑몰의 회원이 되어 다양한 혜택을 누려보세요</p>
+                        </div>
+                        
+                        <div class="login-card-body">
+                            <div th:if="${param.error}" class="alert alert-danger d-flex align-items-center mb-3" role="alert">
+                                <i class="bi bi-exclamation-circle-fill me-2"></i>
+                                <div>이미 사용중인 아이디입니다.</div>
+                            </div>
+                            
+                            <form action="/member" method="POST" id="registerForm">
+                                <div class="mb-3">
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="displayName" 
+                                           name="displayName" 
+                                           placeholder="이름"
+                                           required>
+                                    <div class="invalid-feedback">
+                                        이름을 입력해주세요.
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="username" 
+                                           name="username" 
+                                           placeholder="아이디"
+                                           required
+                                           autocomplete="username">
+                                    <div class="invalid-feedback">
+                                        아이디를 입력해주세요.
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <input type="password" 
+                                           class="form-control" 
+                                           id="password" 
+                                           name="password" 
+                                           placeholder="비밀번호"
+                                           required
+                                           autocomplete="new-password">
+                                    <div class="invalid-feedback">
+                                        비밀번호를 입력해주세요.
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary w-100 btn-login">
+                                    <i class="bi bi-person-plus me-2"></i>가입하기
+                                </button>
+                                
+                                <div class="register-link">
+                                    <p class="register-text">
+                                        이미 회원이신가요?
+                                        <a href="/login">로그인</a>
+                                    </p>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </th:block>
+    
+    <th:block th:fragment="customJs">
+        <script>
+            document.getElementById('registerForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                const displayName = document.getElementById('displayName');
+                const username = document.getElementById('username');
+                const password = document.getElementById('password');
+                
+                let isValid = true;
+                
+                [displayName, username, password].forEach(input => {
+                    if (!input.value.trim()) {
+                        input.classList.add('is-invalid');
+                        isValid = false;
+                    } else {
+                        input.classList.remove('is-invalid');
+                    }
+                });
+                
+                if (isValid) {
+                    this.submit();
+                }
+            });
+            
+            ['displayName', 'username', 'password'].forEach(id => {
+                document.getElementById(id).addEventListener('input', function() {
+                    if (this.value) {
+                        this.classList.remove('is-invalid');
+                    }
+                });
+            });
+        </script>
+    </th:block>
 </body>
 </html>

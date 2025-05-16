@@ -1,26 +1,113 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/default :: layout(~{::title}, ~{::content}, ~{::customCss}, ~{::customJs})}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-    <link href="/main.css" rel="stylesheet">
+    <title>로그인 - 쇼핑몰</title>
+    <th:block th:fragment="customCss">
+        <link rel="stylesheet" th:href="@{/css/login.css}">
+    </th:block>
 </head>
 <body>
-    <div th:replace="~{ nav.html::navbar }"></div>
-
-    <h4>로그인하세요</h4>
-
-    <div th:if="${param.error}">
-        <h4>아이디나 비번 틀림</h4>
-    </div>
-
-    <form action="/login" method="POST">
-        <input name="username">
-        <input name="password" type="password">
-        <button type="submit">전송</button>
-    </form>
+    <th:block th:fragment="content">
+        <div class="login-wrapper">
+            <div class="container">
+                <div class="login-container">
+                    <div class="card login-card">
+                        <div class="login-card-header">
+                            <h2 class="login-title">환영합니다</h2>
+                            <p class="login-subtitle">쇼핑몰에서 다양한 상품을 만나보세요</p>
+                        </div>
+                        
+                        <div class="login-card-body">
+                            <div th:if="${param.error}" class="alert alert-danger d-flex align-items-center" role="alert">
+                                <i class="bi bi-exclamation-circle-fill me-2"></i>
+                                <div>아이디 또는 비밀번호가 올바르지 않습니다.</div>
+                            </div>
+                            
+                            <form action="/login" method="POST" id="loginForm">
+                                <div class="mb-3">
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="username" 
+                                           name="username" 
+                                           placeholder="아이디"
+                                           aria-label="아이디"
+                                           aria-describedby="username-help"
+                                           required
+                                           autocomplete="username">
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <input type="password" 
+                                           class="form-control" 
+                                           id="password" 
+                                           name="password" 
+                                           placeholder="비밀번호"
+                                           required
+                                           autocomplete="current-password">
+                                    <div class="invalid-feedback">
+                                        비밀번호를 입력해주세요.
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary w-100 btn-login">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i>로그인
+                                </button>
+                                
+                                <div class="register-link">
+                                    <p class="register-text">
+                                        아직 회원이 아니신가요?
+                                        <a href="/register">회원가입</a>
+                                    </p>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </th:block>
+    
+    <th:block th:fragment="customJs">
+        <script>
+            document.getElementById('loginForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                const username = document.getElementById('username');
+                const password = document.getElementById('password');
+                
+                // 입력값 검증
+                let isValid = true;
+                
+                if (!username.value.trim()) {
+                    username.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    username.classList.remove('is-invalid');
+                }
+                
+                if (!password.value) {
+                    password.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    password.classList.remove('is-invalid');
+                }
+                
+                // 유효성 검사 통과시에만 폼 제출
+                if (isValid) {
+                    this.submit();
+                }
+            });
+            
+            // 입력 필드에 값이 입력되면 에러 표시 제거
+            ['username', 'password'].forEach(id => {
+                document.getElementById(id).addEventListener('input', function() {
+                    if (this.value) {
+                        this.classList.remove('is-invalid');
+                    }
+                });
+            });
+        </script>
+    </th:block>
 </body>
 </html>
