@@ -3,6 +3,7 @@ package com.virtue.springbootweb.item;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -27,24 +28,35 @@ public class ItemController {
     }
 
     @GetMapping("/list/{pageNum}")
-    String getListPage(Model model, @PathVariable Integer pageNum) {
-        Page<Item> result = itemRepository.findPageBy(PageRequest.of(pageNum - 1, 6));
+    String getListPage(Model model, 
+                      @PathVariable Integer pageNum,
+                      @RequestParam(required = false, defaultValue = "desc") String sort) {
+        Sort.Direction direction = sort.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Page<Item> result = itemRepository.findPageBy(
+            PageRequest.of(pageNum - 1, 6, Sort.by(direction, "id"))
+        );
         model.addAttribute("items", result);
+        model.addAttribute("currentSort", sort);
         return "list.html";
     }
 
     @GetMapping("/write")
     @PreAuthorize("isAuthenticated()")
-    String write() {
+    String writePage() {
         return "write.html";
     }
 
-    @PostMapping("/add")
+    @PostMapping("/write")
     @PreAuthorize("isAuthenticated()")
-    public String addItem(@RequestParam String title,
-                          @RequestParam Integer price,
-                          @RequestParam(required = false) String img) {
-        itemService.saveItem(title, price, img);
+    String writeItem(@RequestParam String title,
+                    @RequestParam Integer price,
+                    @RequestParam(required = false) String img) {
+        Item item = new Item();
+        item.setTitle(title);
+        item.setPrice(price);
+        item.setImgUrl(img);
+        
+        itemRepository.save(item);
         return "redirect:/list";
     }
 

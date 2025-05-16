@@ -1,58 +1,407 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layouts/default :: layout(~{::title}, ~{::content}, ~{::customCss}, ~{::customJs})}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Item 등록</title>
-    <link href="/main.css" rel="stylesheet">
+    <title>상품 등록 - 쇼핑몰</title>
+    <th:block th:fragment="customCss">
+        <style>
+            .write-wrapper {
+                padding: 3rem 0;
+                min-height: calc(100vh - 72px);
+            }
+
+            .write-container {
+                max-width: 600px;
+                margin: 0 auto;
+                background-color: var(--bs-body-bg);
+                border-radius: 1rem;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                padding: 2rem;
+            }
+
+            .write-title {
+                font-size: 1.75rem;
+                font-weight: 700;
+                margin-bottom: 2rem;
+                text-align: center;
+                color: var(--bs-body-color);
+            }
+
+            .form-label {
+                font-weight: 500;
+                color: var(--bs-body-color);
+                margin-bottom: 0.5rem;
+            }
+
+            .form-control {
+                border-radius: 0.5rem;
+                padding: 0.75rem 1rem;
+                border: 1px solid var(--bs-border-color);
+                background-color: var(--bs-body-bg);
+                color: var(--bs-body-color);
+            }
+
+            .form-control:focus {
+                border-color: var(--bs-primary);
+                box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+            }
+
+            /* 모든 입력 필드 유효성 검사 스타일 제거 */
+            .form-control.is-valid,
+            .form-control.is-invalid,
+            .form-control:valid,
+            .form-control:invalid,
+            .was-validated .form-control:valid,
+            .was-validated .form-control:invalid {
+                border-color: var(--bs-border-color) !important;
+            }
+
+            .form-control.is-valid:focus,
+            .form-control.is-invalid:focus,
+            .form-control:valid:focus,
+            .form-control:invalid:focus,
+            .was-validated .form-control:valid:focus,
+            .was-validated .form-control:invalid:focus {
+                border-color: var(--bs-primary) !important;
+                box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+            }
+
+            /* 체크/경고 아이콘 유지 */
+            .form-control.is-valid {
+                padding-right: calc(1.5em + 0.75rem);
+                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+                background-repeat: no-repeat;
+                background-position: right calc(0.375em + 0.1875rem) center;
+                background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+            }
+
+            .form-control.is-invalid {
+                padding-right: calc(1.5em + 0.75rem);
+                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+                background-repeat: no-repeat;
+                background-position: right calc(0.375em + 0.1875rem) center;
+                background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+            }
+
+            /* 이미지 입력 필드는 아이콘도 제거 */
+            input[type="file"].form-control.is-valid,
+            input[type="file"].form-control.is-invalid,
+            input[type="file"].form-control:valid,
+            input[type="file"].form-control:invalid,
+            .was-validated input[type="file"].form-control:valid,
+            .was-validated input[type="file"].form-control:invalid {
+                background-image: none;
+                padding-right: 0.75rem;
+            }
+
+            .validation-message {
+                display: none;
+                font-size: 0.875rem;
+                margin-top: 0.25rem;
+            }
+
+            .form-control.is-invalid ~ .validation-message.invalid-feedback {
+                display: block;
+                color: var(--bs-danger);
+            }
+
+            .form-control.is-valid ~ .validation-message.valid-feedback {
+                display: block;
+                color: var(--bs-success);
+            }
+
+            .preview-image {
+                width: 100%;
+                max-height: 300px;
+                object-fit: contain;
+                border-radius: 0.5rem;
+                transition: filter 0.3s ease;
+            }
+
+            .image-preview-container {
+                position: relative;
+                margin-top: 0.5rem;
+                overflow: hidden;
+            }
+
+            .remove-image-btn {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0;
+                background-color: rgba(var(--bs-danger-rgb), 0.9);
+                color: white;
+                border: none;
+                border-radius: 0.5rem;
+                padding: 0.75rem 1.5rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                font-size: 1rem;
+                white-space: nowrap;
+            }
+
+            .image-preview-container:hover .remove-image-btn {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+
+            .remove-image-btn:hover {
+                background-color: var(--bs-danger);
+            }
+
+            .image-preview-container:hover .preview-image {
+                filter: brightness(0.5);
+            }
+
+            .image-placeholder {
+                width: 100%;
+                height: 200px;
+                background-color: var(--bs-secondary-bg);
+                border-radius: 0.5rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: var(--bs-secondary);
+                margin-top: 0.5rem;
+            }
+
+            .btn-submit {
+                padding: 0.75rem 2rem;
+                font-weight: 500;
+            }
+
+            [data-bs-theme="dark"] .write-container {
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            }
+        </style>
+    </th:block>
 </head>
 <body>
-<!-- 네비게이션 -->
-<div th:replace="~{ nav.html::navbar }"></div>
+    <th:block th:fragment="content">
+        <div class="write-wrapper">
+            <div class="container">
+                <div class="write-container">
+                    <h1 class="write-title">상품 등록</h1>
+                    
+                    <form action="/write" method="post" class="needs-validation" novalidate>
+                        <!-- 제목 -->
+                        <div class="mb-4">
+                            <label for="title" class="form-label">상품명</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="title" 
+                                   name="title" 
+                                   required
+                                   minlength="2"
+                                   maxlength="100">
+                            <div class="validation-message invalid-feedback">
+                                상품명은 2-100자 사이로 입력해주세요.
+                            </div>
+                            <div class="validation-message valid-feedback">
+                                올바른 상품명 형식입니다.
+                            </div>
+                        </div>
 
-<!-- 폼 -->
-<form action="/add" method="POST">
-    <input type="text" name="title" placeholder="제목"><br>
-    <input type="number" name="price" placeholder="가격"><br>
+                        <div class="mb-4">
+                            <label for="price" class="form-label">가격</label>
+                            <div class="input-group has-validation">
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="price" 
+                                       name="price"
+                                       required
+                                       min="100"
+                                       max="100000000">
+                                <span class="input-group-text">원</span>
+                                <div class="validation-message invalid-feedback">
+                                    가격은 100원-1억원 사이로 입력해주세요.
+                                </div>
+                                <div class="validation-message valid-feedback">
+                                    올바른 가격 형식입니다.
+                                </div>
+                            </div>
+                        </div>
 
-    <!-- 이미지 업로드 결과를 저장하는 hidden 필드 -->
-    <input type="hidden" name="img">
+                        <!-- 가격 조정 버튼 -->
+                        <div class="mb-4">
+                            <div class="d-flex gap-2 flex-wrap">
+                                <button type="button" class="btn btn-outline-secondary btn-sm price-adjust" data-amount="100">+100원</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm price-adjust" data-amount="500">+500원</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm price-adjust" data-amount="1000">+1,000원</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm price-adjust" data-amount="10000">+10,000원</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm price-adjust" data-amount="100000">+100,000원</button>
+                                <button type="button" class="btn btn-danger btn-sm" id="resetPrice">초기화</button>
+                            </div>
+                        </div>
 
-    <button type="submit">전송</button>
-</form>
+                        <!-- 이미지 -->
+                        <div class="mb-4">
+                            <label for="image" class="form-label">상품 이미지</label>
+                            <input type="file" 
+                                   class="form-control" 
+                                   id="image" 
+                                   accept="image/*"
+                                   onchange="previewImage(this)"
+                                   style="border-right-width: 1px; padding-right: 12px; background-image: none;">
+                            
+                            <!-- 이미지 미리보기 -->
+                            <div id="imagePreview">
+                                <div class="image-placeholder">
+                                    <i class="bi bi-image fs-1"></i>
+                                </div>
+                            </div>
 
-<!-- 이미지 업로드 -->
-<input type="file" onchange="getURL(this)">
-<img src="" style="width: 300px; height: auto; margin-top: 10px;">
+                            <!-- 업로드된 이미지 URL (숨김) -->
+                            <input type="hidden" name="img" id="img">
+                        </div>
 
-<script>
-    async function getURL(e) {
-        let file = e.files[0];
-        let name = encodeURIComponent(file.name);
+                        <!-- 버튼 -->
+                        <div class="d-flex gap-3 justify-content-center mt-5">
+                            <a href="/list" class="btn btn-outline-secondary px-4 d-flex align-items-center justify-content-center">취소</a>
+                            <button type="submit" class="btn btn-primary btn-submit d-flex align-items-center justify-content-center">등록하기</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </th:block>
 
-        // presigned URL 요청
-        let result = await fetch('/presigned-url?filename=' + name);
-        let uploadUrl = await result.text();
+    <th:block th:fragment="customJs">
+        <script>
+            // 폼 유효성 검사
+            (function () {
+                'use strict'
 
-        // 실제 파일 업로드
-        let uploadResult = await fetch(uploadUrl, {
-            method: 'PUT',
-            body: file
-        });
+                // 실시간 입력 검사
+                function validateInput(input) {
+                    // 이미지 입력 필드는 제외
+                    if (input.type === 'file') return;
+                    
+                    if (input.checkValidity()) {
+                        input.classList.remove('is-invalid');
+                        input.classList.add('is-valid');
+                    } else {
+                        input.classList.remove('is-valid');
+                        input.classList.add('is-invalid');
+                    }
+                }
 
-        // 결과 처리
-        if (uploadResult.ok) {
-            let imageUrl = uploadUrl.split("?")[0];
-            document.querySelector('img').src = imageUrl;
-            document.querySelector('input[name="img"]').value = imageUrl; // 폼에 저장
-            console.log("업로드 성공:", imageUrl);
-        } else {
-            alert("이미지 업로드 실패");
-        }
-    }
-</script>
+                // 제목 입력 검사
+                const titleInput = document.getElementById('title');
+                titleInput.addEventListener('input', function() {
+                    validateInput(this);
+                });
 
+                // 가격 입력 검사
+                const priceInput = document.getElementById('price');
+                priceInput.addEventListener('input', function() {
+                    validateInput(this);
+                });
+
+                // 가격 조정 버튼 클릭 후 검사
+                document.querySelectorAll('.price-adjust').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const amount = parseInt(this.dataset.amount);
+                        const currentPrice = parseInt(priceInput.value) || 0;
+                        priceInput.value = currentPrice + amount;
+                        setTimeout(() => validateInput(priceInput), 0);
+                    });
+                });
+
+                // 가격 초기화 버튼 클릭 후 검사
+                document.getElementById('resetPrice').addEventListener('click', function() {
+                    const priceInput = document.getElementById('price');
+                    priceInput.value = 0;
+                    setTimeout(() => validateInput(priceInput), 0);
+                });
+
+                // 폼 제출 전 최종 검사
+                var forms = document.querySelectorAll('.needs-validation')
+                Array.prototype.slice.call(forms).forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false)
+                })
+            })()
+
+            // 이미지 미리보기 및 업로드
+            async function previewImage(input) {
+                const preview = document.getElementById('imagePreview');
+                const file = input.files[0];
+                
+                if (file) {
+                    // 파일 이름 인코딩
+                    const name = encodeURIComponent(file.name);
+
+                    try {
+                        // Presigned URL 요청
+                        const response = await fetch('/presigned-url?filename=' + name);
+                        const uploadUrl = await response.text();
+
+                        // 파일 업로드
+                        const uploadResult = await fetch(uploadUrl, {
+                            method: 'PUT',
+                            body: file
+                        });
+
+                        if (uploadResult.ok) {
+                            const imageUrl = uploadUrl.split("?")[0];
+                            
+                            // 미리보기 업데이트
+                            preview.innerHTML = `
+                                <div class="image-preview-container">
+                                    <img src="${imageUrl}" class="preview-image" alt="미리보기">
+                                    <button type="button" class="remove-image-btn" onclick="removeImage()">
+                                        <i class="bi bi-trash"></i>
+                                        제거하기
+                                    </button>
+                                </div>`;
+                            
+                            // 숨겨진 입력 필드 업데이트
+                            document.getElementById('img').value = imageUrl;
+                        } else {
+                            throw new Error('이미지 업로드 실패');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert('이미지 업로드 중 오류가 발생했습니다.');
+                        
+                        // 에러 시 플레이스홀더 표시
+                        preview.innerHTML = `
+                            <div class="image-placeholder">
+                                <i class="bi bi-image fs-1"></i>
+                            </div>`;
+                    }
+                }
+            }
+
+            // 이미지 제거 함수
+            function removeImage() {
+                const preview = document.getElementById('imagePreview');
+                const imageInput = document.getElementById('image');
+                const imgUrlInput = document.getElementById('img');
+                
+                // 미리보기 초기화
+                preview.innerHTML = `
+                    <div class="image-placeholder">
+                        <i class="bi bi-image fs-1"></i>
+                    </div>`;
+                
+                // 파일 입력 초기화
+                imageInput.value = '';
+                // 이미지 URL 입력 초기화
+                imgUrlInput.value = '';
+            }
+        </script>
+    </th:block>
 </body>
 </html>
