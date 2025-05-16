@@ -1,5 +1,6 @@
 package com.virtue.springbootweb.item;
 
+import com.virtue.springbootweb.comment.CommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +21,7 @@ public class ItemController {
     private final ItemRepository itemRepository;
     private final ItemService itemService;
     private final S3Service s3Service;
+    private final CommentRepository commentRepository;
 
     @GetMapping("/list")
     String listRedirect() {
@@ -69,6 +71,7 @@ public class ItemController {
             model.addAttribute("data", result.get());
             model.addAttribute("page", page);
             model.addAttribute("sort", sort);
+            model.addAttribute("comments", commentRepository.findByItemIdOrderByCreatedAtDesc(id));
             return "detail.html";
         } else {
             return "redirect:/list";

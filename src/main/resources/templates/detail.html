@@ -115,18 +115,124 @@
                         </div>
                     </div>
                 </div>
-                
+
+                <!-- 댓글 섹션 -->
+                <div class="comments-section mt-5">
+                    <h3 class="mb-4">댓글</h3>
+                    
+                    <!-- 댓글 작성 폼 -->
+                    <div class="comment-form mb-4" sec:authorize="isAuthenticated()">
+                        <div class="card">
+                            <div class="card-body">
+                                <form id="commentForm" class="mb-0">
+                                    <div class="mb-3">
+                                        <textarea class="form-control" id="commentContent" rows="3" 
+                                                  placeholder="댓글을 작성해주세요"></textarea>
+                                    </div>
+                                    <div class="text-end">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-chat-dots me-2"></i>댓글 작성
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 로그인 안내 -->
+                    <div class="alert alert-info" sec:authorize="!isAuthenticated()">
+                        <i class="bi bi-info-circle me-2"></i>댓글을 작성하려면 
+                        <a href="/login" class="alert-link">로그인</a>이 필요합니다.
+                    </div>
+
+                    <!-- 댓글 목록 -->
+                    <div id="commentsList">
+                        <div th:each="comment : ${comments}" class="comment-item card mb-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1" th:text="${comment.author}">작성자</h6>
+                                        <p class="mb-1" th:text="${comment.content}">댓글 내용</p>
+                                        <small class="text-muted" 
+                                               th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}">
+                                            작성일
+                                        </small>
+                                    </div>
+                                    <button th:if="${#authentication.name == comment.author}"
+                                            class="btn btn-outline-danger btn-sm"
+                                            th:onclick="'deleteComment(' + ${comment.id} + ')'">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="back-button-container">
                     <a th:href="@{/list/{page}(page=${page}, sort=${sort})}" class="btn btn-back">
                         목록으로 돌아가기
                     </a>
                 </div>
             </div>
-</div>
+        </div>
     </th:block>
 
     <th:block th:fragment="customJs">
-        <script>
+        <script th:inline="javascript">
+            const itemId = [[${data.id}]];
+
+            // 댓글 작성
+            document.getElementById('commentForm')?.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const content = document.getElementById('commentContent').value;
+                
+                try {
+                    const response = await fetch('/api/comments', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            itemId: itemId,
+                            content: content
+                        })
+                    });
+
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        const error = await response.text();
+                        alert('댓글 작성 실패: ' + error);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('댓글 작성 중 오류가 발생했습니다.');
+                }
+            });
+
+            // 댓글 삭제
+            async function deleteComment(commentId) {
+                if (!confirm('정말로 이 댓글을 삭제하시겠습니까?')) return;
+
+                try {
+                    const response = await fetch(`/api/comments/${commentId}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        const error = await response.text();
+                        alert('댓글 삭제 실패: ' + error);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('댓글 삭제 중 오류가 발생했습니다.');
+                }
+            }
+
+            // 기존 스크립트 유지
             function deleteItem(id) {
                 if (confirm('정말로 이 상품을 삭제하시겠습니까?')) {
                     fetch(`/item?id=${id}`, { 
