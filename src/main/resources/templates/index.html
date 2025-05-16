@@ -73,6 +73,9 @@
                         <a href="/list" class="btn btn-primary">
                             <i class="bi bi-shop me-2"></i>쇼핑하기
                         </a>
+                        <a href="/event" class="btn btn-info text-white">
+                            <i class="bi bi-gift me-2"></i>이벤트
+                        </a>
                         <a href="/register" class="btn btn-outline-primary" sec:authorize="!isAuthenticated()">
                             <i class="bi bi-person-plus me-2"></i>회원가입
                         </a>
@@ -86,7 +89,7 @@
                                 <div class="feature-icon">
                                     <i class="bi bi-truck"></i>
                                 </div>
-                                <h3 class="card-title h5">빠른 배송</h3>
+                                <h3 class="card-title h5">아마도 빠른 배송</h3>
                                 <p class="card-text text-muted">주문 후 최대 2일 이내 배송 완료</p>
                             </div>
                         </div>
@@ -98,8 +101,8 @@
                                 <div class="feature-icon">
                                     <i class="bi bi-shield-check"></i>
                                 </div>
-                                <h3 class="card-title h5">100% 정품 보증</h3>
-                                <p class="card-text text-muted">모든 상품 정품 인증 보장</p>
+                                <h3 class="card-title h5">50% 확률 정품 보증</h3>
+                                <p class="card-text text-muted">모든 상품 정품 인증 보장 불가</p>
                             </div>
                         </div>
                     </div>
@@ -110,8 +113,8 @@
                                 <div class="feature-icon">
                                     <i class="bi bi-headset"></i>
                                 </div>
-                                <h3 class="card-title h5">24/7 고객 지원</h3>
-                                <p class="card-text text-muted">언제든 문의주세요</p>
+                                <h3 class="card-title h5">고객 지원</h3>
+                                <p class="card-text text-muted">안 바쁠 때 문의하세요</p>
                             </div>
                         </div>
                     </div>
@@ -119,5 +122,7 @@
             </div>
         </div>
     </th:block>
+
+    <th:block th:fragment="customJs"></th:block>
 </body>
 </html>
