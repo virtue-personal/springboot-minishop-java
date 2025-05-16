@@ -16,6 +16,7 @@
                 border: none;
                 background-color: var(--bs-body-bg);
                 box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                height: 100%;
             }
 
             .card:hover {
@@ -43,13 +44,8 @@
 
             .card-title {
                 color: var(--bs-body-color);
-                text-decoration: none;
                 font-weight: 600;
                 margin-bottom: 0.5rem;
-            }
-
-            .card-title:hover {
-                color: var(--bs-primary);
             }
 
             .price {
@@ -62,6 +58,17 @@
                 padding: 0.5rem 1rem;
                 border-radius: 0.5rem;
                 transition: all 0.3s ease;
+            }
+
+            .card-link {
+                text-decoration: none;
+                color: inherit;
+                display: block;
+                height: 100%;
+            }
+
+            .card-link:hover {
+                color: inherit;
             }
 
             .pagination {
@@ -126,26 +133,26 @@
                 <!-- 상품 목록 -->
                 <div class="row g-4" th:if="${!items.empty}">
                     <div class="col-md-4" th:each="item : ${items.content}">
-                        <div class="card h-100">
-                            <img th:src="${item.imgUrl != null and !item.imgUrl.isEmpty()} ? ${item.imgUrl} : 'https://placehold.co/300'"
-                                 class="card-img-top" th:alt="${item.title}">
-                            <div class="card-body d-flex flex-column">
-                                <a th:href="@{/detail/{id}(id=${item.id})}" class="text-decoration-none">
+                        <a th:href="@{/detail/{id}(id=${item.id})}" class="card-link">
+                            <div class="card">
+                                <img th:src="${item.imgUrl != null and !item.imgUrl.isEmpty()} ? ${item.imgUrl} : 'https://placehold.co/300'"
+                                     class="card-img-top" th:alt="${item.title}">
+                                <div class="card-body d-flex flex-column">
                                     <h5 class="card-title" th:text="${item.title}">제목</h5>
-                                </a>
-                                <p class="price mb-3" th:text="${#numbers.formatInteger(item.price, 0, 'COMMA') + '원'}">가격</p>
-                                <div class="mt-auto d-flex justify-content-between gap-2" sec:authorize="isAuthenticated()">
-                                    <a th:href="@{/edit/{id}(id=${item.id})}" 
-                                       class="btn btn-outline-primary btn-action flex-grow-1">
-                                        <i class="bi bi-pencil me-2"></i>수정
-                                    </a>
-                                    <button class="btn btn-outline-danger btn-action flex-grow-1"
-                                            th:onclick="'deleteItem(' + ${item.id} + ')'">
-                                        <i class="bi bi-trash me-2"></i>삭제
-                                    </button>
+                                    <p class="price mb-3" th:text="${#numbers.formatInteger(item.price, 0, 'COMMA') + '원'}">가격</p>
+                                    <div class="mt-auto d-flex justify-content-between gap-2" sec:authorize="isAuthenticated()">
+                                        <a th:href="@{/edit/{id}(id=${item.id})}" 
+                                           class="btn btn-outline-primary btn-action flex-grow-1">
+                                            <i class="bi bi-pencil me-2"></i>수정
+                                        </a>
+                                        <button class="btn btn-outline-danger btn-action flex-grow-1"
+                                                th:onclick="'deleteItem(' + ${item.id} + ')'">
+                                            <i class="bi bi-trash me-2"></i>삭제
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
 
