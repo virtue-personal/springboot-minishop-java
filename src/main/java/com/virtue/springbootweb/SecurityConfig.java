@@ -8,21 +8,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.csrf.CsrfTokenRepository;
-import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-
-    @Bean
-    public CsrfTokenRepository csrfTokenRepository() {
-        HttpSessionCsrfTokenRepository repository =
-                new HttpSessionCsrfTokenRepository();
-        repository.setHeaderName("X-XSRF-TOKEN");
-        return repository;
-    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -36,12 +26,24 @@ public class SecurityConfig {
                 authorize.requestMatchers("/**").permitAll()
         );
 
-        http.formLogin((formLogin)
-                -> formLogin.loginPage("/login")
-                .defaultSuccessUrl("/")
+        http.formLogin((formLogin) ->
+                formLogin
+                    .loginPage("/login")
+                    .loginProcessingUrl("/login")
+                    .usernameParameter("username")
+                    .passwordParameter("password")
+                    .defaultSuccessUrl("/")
+                    .failureUrl("/login?error=true")
         );
 
-        http.logout(logout -> logout.logoutUrl("/logout"));
+        http.logout(logout -> 
+            logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/")
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
+        );
+
         return http.build();
     }
 
