@@ -16,24 +16,28 @@ public class MemberController {
 
     @GetMapping("/register")
     public String register() {
-        return "register.html";
+        return "register";
     }
 
     @PostMapping("/member")
-    public String addMember(String username, String password, String displayName) throws Exception {
-        memberService.saveUser(username, password, displayName);
-        return "redirect:/list";
+    public String addMember(String username, String password, String displayName) {
+        try {
+            memberService.saveUser(username, password, displayName);
+            return "redirect:/login";
+        } catch (Exception e) {
+            return "redirect:/register?error=true";
+        }
     }
 
     @GetMapping("/login")
     public String login() {
-        return "login.html";
+        return "login";
     }
 
     @GetMapping("/my-page")
     public String myPage(Authentication auth) {
         CustomUser result = (CustomUser) auth.getPrincipal();
-        return "mypage.html";
+        return "mypage";
     }
 
     @GetMapping("/user/1")
