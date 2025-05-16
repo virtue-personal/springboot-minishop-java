@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       th:replace="~{layouts/default :: layout(~{::title}, ~{::content}, ~{::customCss}, ~{::customJs})}">
 <head>
     <meta charset="UTF-8">
@@ -72,7 +73,7 @@
                         <a href="/list" class="btn btn-primary">
                             <i class="bi bi-shop me-2"></i>쇼핑하기
                         </a>
-                        <a href="/register" class="btn btn-outline-primary">
+                        <a href="/register" class="btn btn-outline-primary" sec:authorize="!isAuthenticated()">
                             <i class="bi bi-person-plus me-2"></i>회원가입
                         </a>
                     </div>
@@ -117,12 +118,6 @@
                 </div>
             </div>
         </div>
-    </th:block>
-
-    <th:block th:fragment="customJs">
-        <script>
-            // 필요한 경우 여기에 JavaScript 코드를 추가하세요
-        </script>
     </th:block>
 </body>
 </html>

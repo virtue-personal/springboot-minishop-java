@@ -5,3 +5,17 @@
 <p th:text="${path}"></p>
 <p th:text="${message}"></p>
 <p th:text="${exception}"></p>
+
+<script>
+function showValidationAlert(messages) {
+    const alertDiv = document.getElementById('validationAlert');
+    const alertContent = alertDiv.querySelector('div');
+    
+    if (messages.length > 0) {
+        alertContent.innerHTML = messages.map(msg => msg).join('<br>');
+        alertDiv.classList.remove('d-none');
+    } else {
+        alertDiv.classList.add('d-none');
+    }
+}
+</script>
