@@ -24,24 +24,30 @@
                                 <div>아이디 또는 비밀번호가 올바르지 않습니다.</div>
                             </div>
                             
-                            <form action="/login" method="POST" id="loginForm">
+                            <div th:if="${param.expired}" class="alert alert-warning d-flex align-items-center" role="alert">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                <div>세션이 만료되었습니다. 다시 로그인해주세요.</div>
+                            </div>
+
+                            <form th:action="@{/login}" method="POST" id="loginForm">
                                 <div class="mb-3">
                                     <input type="text" 
                                            class="form-control" 
                                            id="username" 
                                            name="username" 
                                            placeholder="아이디"
-                                           aria-label="아이디"
-                                           aria-describedby="username-help"
                                            required
                                            autocomplete="username">
+                                    <div class="invalid-feedback">
+                                        아이디를 입력해주세요.
+                                    </div>
                                 </div>
-                                
+
                                 <div class="mb-4">
-                                    <input type="password" 
-                                           class="form-control" 
-                                           id="password" 
-                                           name="password" 
+                                    <input type="password"
+                                           class="form-control"
+                                           id="password"
+                                           name="password"
                                            placeholder="비밀번호"
                                            required
                                            autocomplete="current-password">
@@ -49,11 +55,11 @@
                                         비밀번호를 입력해주세요.
                                     </div>
                                 </div>
-                                
+
                                 <button type="submit" class="btn btn-primary w-100 btn-login">
                                     <i class="bi bi-box-arrow-in-right me-2"></i>로그인
                                 </button>
-                                
+
                                 <div class="register-link">
                                     <p class="register-text">
                                         아직 회원이 아니신가요?
@@ -67,45 +73,52 @@
             </div>
         </div>
     </th:block>
-    
+
     <th:block th:fragment="customJs">
         <script>
+            // 폼 제출 시 유효성 검사
             document.getElementById('loginForm').addEventListener('submit', function(event) {
-                event.preventDefault();
-                
                 const username = document.getElementById('username');
                 const password = document.getElementById('password');
                 
-                // 입력값 검증
                 let isValid = true;
-                
+
                 if (!username.value.trim()) {
                     username.classList.add('is-invalid');
                     isValid = false;
                 } else {
                     username.classList.remove('is-invalid');
                 }
-                
+
                 if (!password.value) {
                     password.classList.add('is-invalid');
                     isValid = false;
                 } else {
                     password.classList.remove('is-invalid');
                 }
-                
-                // 유효성 검사 통과시에만 폼 제출
-                if (isValid) {
-                    this.submit();
+
+                if (!isValid) {
+                    event.preventDefault();
                 }
             });
             
-            // 입력 필드에 값이 입력되면 에러 표시 제거
+            // 입력 필드 변경 시 유효성 검사 메시지 제거
             ['username', 'password'].forEach(id => {
                 document.getElementById(id).addEventListener('input', function() {
                     if (this.value) {
                         this.classList.remove('is-invalid');
                     }
                 });
+            });
+
+            // 페이지 로드 시 username 필드에 포커스
+            window.addEventListener('load', function() {
+                const username = document.getElementById('username');
+                if (!username.value) {
+                    username.focus();
+                } else {
+                    document.getElementById('password').focus();
+                }
             });
         </script>
     </th:block>

@@ -5,6 +5,24 @@
     <title>회원가입 - 쇼핑몰</title>
     <th:block th:fragment="customCss">
         <link rel="stylesheet" th:href="@{/css/login.css}">
+        <style>
+            .form-control:focus {
+                border-color: transparent;
+                box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+            }
+            .form-control.is-valid:focus {
+                border-color: transparent;
+                box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.15);
+            }
+            .form-control.is-invalid:focus {
+                border-color: transparent;
+                box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.15);
+            }
+            .form-control.is-valid,
+            .form-control.is-invalid {
+                border-color: transparent;
+            }
+        </style>
     </th:block>
 </head>
 <body>
@@ -17,23 +35,32 @@
                             <h2 class="login-title">회원가입</h2>
                             <p class="login-subtitle">쇼핑몰의 회원이 되어 다양한 혜택을 누려보세요</p>
                         </div>
-                        
+
                         <div class="login-card-body">
-                            <div th:if="${param.error}" class="alert alert-danger d-flex align-items-center mb-3" role="alert">
+                            <div th:if="${error}" class="alert alert-danger d-flex align-items-center" role="alert">
                                 <i class="bi bi-exclamation-circle-fill me-2"></i>
-                                <div>이미 사용중인 아이디입니다.</div>
+                                <div th:text="${error}"></div>
                             </div>
                             
-                            <form action="/member" method="POST" id="registerForm">
+                            <div id="validationAlert" class="alert alert-danger d-flex align-items-center d-none" role="alert">
+                                <i class="bi bi-exclamation-circle-fill me-2"></i>
+                                <div>아래 항목들을 다시 확인해주세요.</div>
+                            </div>
+                            
+                            <form action="/register" method="POST" id="registerForm" novalidate>
                                 <div class="mb-3">
                                     <input type="text" 
                                            class="form-control" 
                                            id="displayName" 
                                            name="displayName" 
                                            placeholder="이름"
+                                           th:value="${displayName}"
                                            required>
-                                    <div class="invalid-feedback">
-                                        이름을 입력해주세요.
+                                    <div class="validation-message invalid-feedback">
+                                        이름은 1-5자 사이로 입력해주세요.
+                                    </div>
+                                    <div class="validation-message valid-feedback">
+                                        올바른 이름 형식입니다.
                                     </div>
                                 </div>
                                 
@@ -43,10 +70,14 @@
                                            id="username" 
                                            name="username" 
                                            placeholder="아이디"
+                                           th:value="${username}"
                                            required
                                            autocomplete="username">
-                                    <div class="invalid-feedback">
-                                        아이디를 입력해주세요.
+                                    <div class="validation-message invalid-feedback">
+                                        아이디는 5-20자 사이로 입력해주세요.
+                                    </div>
+                                    <div class="validation-message valid-feedback">
+                                        올바른 아이디 형식입니다.
                                     </div>
                                 </div>
                                 
@@ -58,8 +89,11 @@
                                            placeholder="비밀번호"
                                            required
                                            autocomplete="new-password">
-                                    <div class="invalid-feedback">
-                                        비밀번호를 입력해주세요.
+                                    <div class="validation-message invalid-feedback">
+                                        비밀번호는 8-16자 사이로 입력해주세요.
+                                    </div>
+                                    <div class="validation-message valid-feedback">
+                                        올바른 비밀번호 형식입니다.
                                     </div>
                                 </div>
                                 
@@ -83,34 +117,121 @@
     
     <th:block th:fragment="customJs">
         <script>
-            document.getElementById('registerForm').addEventListener('submit', function(event) {
+            // 실시간 입력 검사
+            function validateInput(input) {
+                const value = input.value.trim();
+                let isValid = true;
+                let message = '';
+
+                switch(input.id) {
+                    case 'displayName':
+                        isValid = value.length > 0 && value.length <= 5;
+                        message = '이름은 1-5자 사이로 입력해주세요.';
+                        break;
+                    case 'username':
+                        isValid = value.length >= 5 && value.length <= 20;
+                        message = '아이디는 5-20자 사이로 입력해주세요.';
+                        break;
+                    case 'password':
+                        isValid = value.length >= 8 && value.length <= 16;
+                        message = '비밀번호는 8-16자 사이로 입력해주세요.';
+                        break;
+                }
+
+                const feedbackDiv = input.nextElementSibling;
+                if (feedbackDiv) {
+                    if (isValid) {
+                        input.classList.remove('is-invalid');
+                        input.classList.add('is-valid');
+                    } else {
+                        input.classList.remove('is-valid');
+                        input.classList.add('is-invalid');
+                        if (feedbackDiv.classList.contains('invalid-feedback')) {
+                            feedbackDiv.textContent = message;
+                        }
+                    }
+                }
+
+                return { isValid, message };
+            }
+
+            function showValidationAlert(show) {
+                const alertDiv = document.getElementById('validationAlert');
+                if (show) {
+                    alertDiv.classList.remove('d-none');
+                } else {
+                    alertDiv.classList.add('d-none');
+                }
+            }
+
+            // 폼 제출 전 유효성 검사
+            document.getElementById('registerForm').addEventListener('submit', async function(event) {
                 event.preventDefault();
                 
                 const displayName = document.getElementById('displayName');
                 const username = document.getElementById('username');
                 const password = document.getElementById('password');
                 
-                let isValid = true;
+                const displayNameValidation = validateInput(displayName);
+                const usernameValidation = validateInput(username);
+                const passwordValidation = validateInput(password);
                 
-                [displayName, username, password].forEach(input => {
-                    if (!input.value.trim()) {
-                        input.classList.add('is-invalid');
-                        isValid = false;
-                    } else {
-                        input.classList.remove('is-invalid');
+                if (!displayNameValidation.isValid || !usernameValidation.isValid || !passwordValidation.isValid) {
+                    showValidationAlert(true);
+                    return;
+                }
+                
+                // 유효성 검사 통과 시 폼 데이터 전송
+                showValidationAlert(false);
+                
+                const formData = new FormData(this);
+                try {
+                    const response = await fetch('/register', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (response.redirected) {
+                        window.location.href = response.url;
+                        return;
                     }
-                });
-                
-                if (isValid) {
-                    this.submit();
+                    
+                    if (data.error) {
+                        const errorDiv = document.querySelector('.alert.alert-danger') || 
+                            document.createElement('div');
+                        errorDiv.className = 'alert alert-danger d-flex align-items-center';
+                        errorDiv.innerHTML = `
+                            <i class="bi bi-exclamation-circle-fill me-2"></i>
+                            <div>${data.error}</div>
+                        `;
+                        
+                        const validationAlert = document.getElementById('validationAlert');
+                        validationAlert.parentNode.insertBefore(errorDiv, validationAlert);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
                 }
             });
             
+            // 실시간 입력 검사 이벤트 리스너
             ['displayName', 'username', 'password'].forEach(id => {
-                document.getElementById(id).addEventListener('input', function() {
-                    if (this.value) {
-                        this.classList.remove('is-invalid');
+                const input = document.getElementById(id);
+                input.addEventListener('input', function() {
+                    const validation = validateInput(this);
+                    if (validation.isValid) {
+                        showValidationAlert(false);
                     }
+                });
+                input.addEventListener('blur', function() {
+                    validateInput(this);
+                });
+                input.addEventListener('paste', function(e) {
+                    setTimeout(() => {
+                        const validation = validateInput(this);
+                        if (validation.isValid) {
+                            showValidationAlert(false);
+                        }
+                    }, 0);
                 });
             });
         </script>
