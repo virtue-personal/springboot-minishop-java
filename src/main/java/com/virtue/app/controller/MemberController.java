@@ -1,12 +1,13 @@
 package com.virtue.app.controller;
 
-import com.virtue.app.domain.CustomUser;
 import com.virtue.app.domain.Member;
 import com.virtue.app.domain.Sales;
 import com.virtue.app.dto.MemberDto;
 import com.virtue.app.repository.MemberRepository;
 import com.virtue.app.repository.SalesRepository;
 import com.virtue.app.service.MemberService;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,11 +17,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import lombok.Getter;
-import lombok.AllArgsConstructor;
-import java.time.LocalDateTime;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Controller
 @RequiredArgsConstructor

@@ -1,8 +1,8 @@
 package com.virtue.app.controller;
 
-import com.virtue.app.repository.CommentRepository;
 import com.virtue.app.domain.Comment;
 import com.virtue.app.domain.Item;
+import com.virtue.app.repository.CommentRepository;
 import com.virtue.app.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

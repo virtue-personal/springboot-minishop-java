@@ -5,7 +5,7 @@
 <head>
     <title>상품 수정 - 쇼핑몰</title>
     <th:block th:fragment="customCss">
-    <style>
+        <style>
             .edit-wrapper {
                 padding: 3rem 0;
                 min-height: calc(100vh - 72px);
@@ -107,7 +107,7 @@
             }
 
             .form-control.is-valid ~ .validation-message.valid-feedback {
-            display: block;
+                display: block;
                 color: var(--bs-success);
             }
 
@@ -177,202 +177,215 @@
 
             [data-bs-theme="dark"] .edit-container {
                 box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
-    </style>
+            }
+        </style>
     </th:block>
 </head>
 <body>
-    <th:block th:fragment="content">
-        <div class="edit-wrapper">
-            <div class="container">
-                <div class="edit-container">
-                    <h1 class="edit-title">상품 수정</h1>
-                    
-                    <form action="/edit" method="post" class="needs-validation" novalidate>
-    <!-- ID (숨김) -->
-    <input type="hidden" name="id" th:value="${data.id}">
+<th:block th:fragment="content">
+    <div class="edit-wrapper">
+        <div class="container">
+            <div class="edit-container">
+                <h1 class="edit-title">상품 수정</h1>
 
-    <!-- 제목 -->
-                        <div class="mb-4">
-                            <label for="title" class="form-label">상품명</label>
-                            <input type="text" 
-                                   class="form-control" 
-                                   id="title" 
-                                   name="title" 
-                                   th:value="${data.title}" 
+                <form action="/edit" method="post" class="needs-validation" novalidate>
+                    <!-- ID (숨김) -->
+                    <input type="hidden" name="id" th:value="${data.id}">
+
+                    <!-- 제목 -->
+                    <div class="mb-4">
+                        <label for="title" class="form-label">상품명</label>
+                        <input type="text"
+                               class="form-control"
+                               id="title"
+                               name="title"
+                               th:value="${data.title}"
+                               required
+                               minlength="2"
+                               maxlength="100">
+                        <div class="validation-message invalid-feedback">
+                            상품명은 2-100자 사이로 입력해주세요.
+                        </div>
+                        <div class="validation-message valid-feedback">
+                            올바른 상품명 형식입니다.
+                        </div>
+                    </div>
+
+                    <!-- 가격 -->
+                    <div class="mb-4">
+                        <label for="price" class="form-label">가격</label>
+                        <div class="input-group has-validation">
+                            <input type="number"
+                                   class="form-control"
+                                   id="price"
+                                   name="price"
+                                   th:value="${data.price}"
                                    required
-                                   minlength="2"
-                                   maxlength="100">
+                                   min="100"
+                                   max="100000000">
+                            <span class="input-group-text">원</span>
                             <div class="validation-message invalid-feedback">
-                                상품명은 2-100자 사이로 입력해주세요.
+                                가격은 100원-1억원 사이로 입력해주세요.
                             </div>
                             <div class="validation-message valid-feedback">
-                                올바른 상품명 형식입니다.
+                                올바른 가격 형식입니다.
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 가격 조정 버튼 -->
+                    <div class="mb-4">
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button type="button" class="btn btn-outline-secondary btn-sm price-adjust"
+                                    data-amount="100">+100원
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm price-adjust"
+                                    data-amount="500">+500원
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm price-adjust"
+                                    data-amount="1000">+1,000원
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm price-adjust"
+                                    data-amount="10000">+10,000원
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm price-adjust"
+                                    data-amount="100000">+100,000원
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" id="resetPrice">초기화</button>
+                        </div>
+                    </div>
+
+                    <!-- 이미지 -->
+                    <div class="mb-4">
+                        <label for="image" class="form-label">상품 이미지</label>
+                        <input type="file"
+                               class="form-control"
+                               id="image"
+                               accept="image/*"
+                               onchange="previewImage(this)"
+                               style="border-right-width: 1px; padding-right: 12px; background-image: none;">
+
+                        <!-- 이미지 미리보기 -->
+                        <div id="imagePreview">
+                            <div th:if="${!#strings.isEmpty(data.imgUrl)}" class="image-preview-container">
+                                <img th:src="${data.imgUrl}"
+                                     class="preview-image"
+                                     alt="현재 이미지">
+                                <button type="button" class="remove-image-btn" onclick="removeImage()">
+                                    <i class="bi bi-trash"></i>
+                                    제거하기
+                                </button>
+                            </div>
+                            <div th:unless="${!#strings.isEmpty(data.imgUrl)}"
+                                 class="image-placeholder">
+                                <i class="bi bi-image fs-1"></i>
                             </div>
                         </div>
 
-    <!-- 가격 -->
-                        <div class="mb-4">
-                            <label for="price" class="form-label">가격</label>
-                            <div class="input-group has-validation">
-                                <input type="number" 
-                                       class="form-control" 
-                                       id="price" 
-                                       name="price" 
-                                       th:value="${data.price}"
-                                       required
-                                       min="100"
-                                       max="100000000">
-                                <span class="input-group-text">원</span>
-                                <div class="validation-message invalid-feedback">
-                                    가격은 100원-1억원 사이로 입력해주세요.
-                                </div>
-                                <div class="validation-message valid-feedback">
-                                    올바른 가격 형식입니다.
-                                </div>
-                            </div>
-                        </div>
-                        <!-- 가격 조정 버튼 -->
-                        <div class="mb-4">
-                            <div class="d-flex gap-2 flex-wrap">
-                                <button type="button" class="btn btn-outline-secondary btn-sm price-adjust" data-amount="100">+100원</button>
-                                <button type="button" class="btn btn-outline-secondary btn-sm price-adjust" data-amount="500">+500원</button>
-                                <button type="button" class="btn btn-outline-secondary btn-sm price-adjust" data-amount="1000">+1,000원</button>
-                                <button type="button" class="btn btn-outline-secondary btn-sm price-adjust" data-amount="10000">+10,000원</button>
-                                <button type="button" class="btn btn-outline-secondary btn-sm price-adjust" data-amount="100000">+100,000원</button>
-                                <button type="button" class="btn btn-danger btn-sm" id="resetPrice">초기화</button>
-                            </div>
-                        </div>
+                        <!-- 업로드된 이미지 URL (숨김) -->
+                        <input type="hidden" name="img" id="img" th:value="${data.imgUrl}">
+                    </div>
 
-                        <!-- 이미지 -->
-                        <div class="mb-4">
-                            <label for="image" class="form-label">상품 이미지</label>
-                            <input type="file" 
-                                   class="form-control" 
-                                   id="image" 
-                                   accept="image/*"
-                                   onchange="previewImage(this)"
-                                   style="border-right-width: 1px; padding-right: 12px; background-image: none;">
-                            
-                            <!-- 이미지 미리보기 -->
-                            <div id="imagePreview">
-                                <div th:if="${!#strings.isEmpty(data.imgUrl)}" class="image-preview-container">
-                                    <img th:src="${data.imgUrl}"
-                                         class="preview-image"
-                                         alt="현재 이미지">
-                                    <button type="button" class="remove-image-btn" onclick="removeImage()">
-                                        <i class="bi bi-trash"></i>
-                                        제거하기
-                                    </button>
-                                </div>
-                                <div th:unless="${!#strings.isEmpty(data.imgUrl)}" 
-                                     class="image-placeholder">
-                                    <i class="bi bi-image fs-1"></i>
-                                </div>
-                            </div>
-
-                            <!-- 업로드된 이미지 URL (숨김) -->
-    <input type="hidden" name="img" id="img" th:value="${data.imgUrl}">
-                        </div>
-
-                        <!-- 버튼 -->
-                        <div class="d-flex gap-3 justify-content-center mt-5">
-                            <a href="/list" class="btn btn-outline-secondary px-4 d-flex align-items-center justify-content-center">취소</a>
-                            <button type="submit" class="btn btn-primary btn-submit d-flex align-items-center justify-content-center">수정하기</button>
-                        </div>
-</form>
-                </div>
+                    <!-- 버튼 -->
+                    <div class="d-flex gap-3 justify-content-center mt-5">
+                        <a href="/list"
+                           class="btn btn-outline-secondary px-4 d-flex align-items-center justify-content-center">취소</a>
+                        <button type="submit"
+                                class="btn btn-primary btn-submit d-flex align-items-center justify-content-center">수정하기
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
-    </th:block>
+    </div>
+</th:block>
 
-    <th:block th:fragment="customJs">
-<script>
-            // 폼 유효성 검사
-            (function () {
-                'use strict'
+<th:block th:fragment="customJs">
+    <script>
+        // 폼 유효성 검사
+        (function () {
+            'use strict'
 
-                // 실시간 입력 검사
-                function validateInput(input) {
-                    // 이미지 입력 필드는 제외
-                    if (input.type === 'file') return;
-                    
-                    if (input.checkValidity()) {
-                        input.classList.remove('is-invalid');
-                        input.classList.add('is-valid');
-                    } else {
-                        input.classList.remove('is-valid');
-                        input.classList.add('is-invalid');
-                    }
+            // 실시간 입력 검사
+            function validateInput(input) {
+                // 이미지 입력 필드는 제외
+                if (input.type === 'file') return;
+
+                if (input.checkValidity()) {
+                    input.classList.remove('is-invalid');
+                    input.classList.add('is-valid');
+                } else {
+                    input.classList.remove('is-valid');
+                    input.classList.add('is-invalid');
                 }
+            }
 
-                // 제목 입력 검사
-                const titleInput = document.getElementById('title');
-                titleInput.addEventListener('input', function() {
-                    validateInput(this);
-                });
+            // 제목 입력 검사
+            const titleInput = document.getElementById('title');
+            titleInput.addEventListener('input', function () {
+                validateInput(this);
+            });
 
-                // 가격 입력 검사
-                const priceInput = document.getElementById('price');
-                priceInput.addEventListener('input', function() {
-                    validateInput(this);
-                });
+            // 가격 입력 검사
+            const priceInput = document.getElementById('price');
+            priceInput.addEventListener('input', function () {
+                validateInput(this);
+            });
 
-                // 가격 조정 버튼 클릭 후 검사
-                document.querySelectorAll('.price-adjust').forEach(button => {
-                    button.addEventListener('click', function() {
-                        const amount = parseInt(this.dataset.amount);
-                        const currentPrice = parseInt(priceInput.value) || 0;
-                        priceInput.value = currentPrice + amount;
-                        setTimeout(() => validateInput(priceInput), 0);
-                    });
-                });
-
-                // 가격 초기화 버튼 클릭 후 검사
-                document.getElementById('resetPrice').addEventListener('click', function() {
-                    const priceInput = document.getElementById('price');
-                    priceInput.value = /*[[${data.price}]]*/ 0;  // 원래 가격으로 초기화
+            // 가격 조정 버튼 클릭 후 검사
+            document.querySelectorAll('.price-adjust').forEach(button => {
+                button.addEventListener('click', function () {
+                    const amount = parseInt(this.dataset.amount);
+                    const currentPrice = parseInt(priceInput.value) || 0;
+                    priceInput.value = currentPrice + amount;
                     setTimeout(() => validateInput(priceInput), 0);
                 });
+            });
 
-                // 폼 제출 전 최종 검사
-                var forms = document.querySelectorAll('.needs-validation')
-                Array.prototype.slice.call(forms).forEach(function (form) {
-                    form.addEventListener('submit', function (event) {
-                        if (!form.checkValidity()) {
-                            event.preventDefault();
-                            event.stopPropagation();
-                        }
-                        form.classList.add('was-validated');
-                    }, false)
-                })
-            })()
+            // 가격 초기화 버튼 클릭 후 검사
+            document.getElementById('resetPrice').addEventListener('click', function () {
+                const priceInput = document.getElementById('price');
+                priceInput.value = /*[[${data.price}]]*/ 0;  // 원래 가격으로 초기화
+                setTimeout(() => validateInput(priceInput), 0);
+            });
 
-            // 이미지 미리보기 및 업로드
-            async function previewImage(input) {
-                const preview = document.getElementById('imagePreview');
-                const file = input.files[0];
-                
-                if (file) {
-                    // 파일 이름 인코딩
-        const name = encodeURIComponent(file.name);
+            // 폼 제출 전 최종 검사
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false)
+            })
+        })()
 
-                    try {
-                        // Presigned URL 요청
-        const response = await fetch('/presigned-url?filename=' + name);
-        const uploadUrl = await response.text();
+        // 이미지 미리보기 및 업로드
+        async function previewImage(input) {
+            const preview = document.getElementById('imagePreview');
+            const file = input.files[0];
 
-                        // 파일 업로드
-                        const uploadResult = await fetch(uploadUrl, {
-            method: 'PUT',
-            body: file
-        });
+            if (file) {
+                // 파일 이름 인코딩
+                const name = encodeURIComponent(file.name);
 
-                        if (uploadResult.ok) {
-                            const imageUrl = uploadUrl.split("?")[0];
-                            
-                            // 미리보기 업데이트
-                            preview.innerHTML = `
+                try {
+                    // Presigned URL 요청
+                    const response = await fetch('/presigned-url?filename=' + name);
+                    const uploadUrl = await response.text();
+
+                    // 파일 업로드
+                    const uploadResult = await fetch(uploadUrl, {
+                        method: 'PUT',
+                        body: file
+                    });
+
+                    if (uploadResult.ok) {
+                        const imageUrl = uploadUrl.split("?")[0];
+
+                        // 미리보기 업데이트
+                        preview.innerHTML = `
                                 <div class="image-preview-container">
                                     <img src="${imageUrl}" class="preview-image" alt="미리보기">
                                     <button type="button" class="remove-image-btn" onclick="removeImage()">
@@ -380,43 +393,43 @@
                                         제거하기
                                     </button>
                                 </div>`;
-                            
-                            // 숨겨진 입력 필드 업데이트
-                            document.getElementById('img').value = imageUrl;
-        } else {
-                            throw new Error('이미지 업로드 실패');
-                        }
-                    } catch (error) {
-                        console.error('Error:', error);
-                        alert('이미지 업로드 중 오류가 발생했습니다.');
-                        
-                        // 에러 시 플레이스홀더 표시
-                        preview.innerHTML = `
+
+                        // 숨겨진 입력 필드 업데이트
+                        document.getElementById('img').value = imageUrl;
+                    } else {
+                        throw new Error('이미지 업로드 실패');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('이미지 업로드 중 오류가 발생했습니다.');
+
+                    // 에러 시 플레이스홀더 표시
+                    preview.innerHTML = `
                             <div class="image-placeholder">
                                 <i class="bi bi-image fs-1"></i>
                             </div>`;
-                    }
                 }
             }
+        }
 
-            // 이미지 제거 함수
-            function removeImage() {
-                const preview = document.getElementById('imagePreview');
-                const imageInput = document.getElementById('image');
-                const imgUrlInput = document.getElementById('img');
-                
-                // 미리보기 초기화
-                preview.innerHTML = `
+        // 이미지 제거 함수
+        function removeImage() {
+            const preview = document.getElementById('imagePreview');
+            const imageInput = document.getElementById('image');
+            const imgUrlInput = document.getElementById('img');
+
+            // 미리보기 초기화
+            preview.innerHTML = `
                     <div class="image-placeholder">
                         <i class="bi bi-image fs-1"></i>
                     </div>`;
-                
-                // 파일 입력 초기화
-                imageInput.value = '';
-                // 이미지 URL 입력 초기화
-                imgUrlInput.value = '';
-    }
-</script>
-    </th:block>
+
+            // 파일 입력 초기화
+            imageInput.value = '';
+            // 이미지 URL 입력 초기화
+            imgUrlInput.value = '';
+        }
+    </script>
+</th:block>
 </body>
 </html>

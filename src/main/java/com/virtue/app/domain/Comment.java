@@ -1,6 +1,5 @@
 package com.virtue.app.domain;
 
-import com.virtue.app.domain.Item;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
