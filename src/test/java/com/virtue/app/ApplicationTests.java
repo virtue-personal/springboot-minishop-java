@@ -1,4 +1,4 @@
-package com.virtue.springbootweb;
+package com.virtue.app;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

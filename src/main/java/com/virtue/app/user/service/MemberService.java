@@ -1,5 +1,7 @@
-package com.virtue.springbootweb.user;
+package com.virtue.app.user.service;
 
+import com.virtue.app.user.domain.Member;
+import com.virtue.app.user.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

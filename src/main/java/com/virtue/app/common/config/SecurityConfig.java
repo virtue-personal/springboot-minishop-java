@@ -1,4 +1,4 @@
-package com.virtue.springbootweb;
+package com.virtue.app.common.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

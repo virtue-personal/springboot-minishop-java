@@ -1,5 +1,6 @@
-package com.virtue.springbootweb.user;
+package com.virtue.app.user.repository;
 
+import com.virtue.app.user.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

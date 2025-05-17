@@ -1,16 +1,17 @@
-package com.virtue.springbootweb.user;
+package com.virtue.app.user.service;
 
+import com.virtue.app.common.CustomUser;
+import com.virtue.app.user.domain.Member;
+import com.virtue.app.user.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Optional;
 
 @Service

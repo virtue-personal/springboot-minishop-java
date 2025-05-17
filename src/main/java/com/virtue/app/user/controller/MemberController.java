@@ -1,5 +1,9 @@
-package com.virtue.springbootweb.user;
+package com.virtue.app.user.controller;
 
+import com.virtue.app.common.CustomUser;
+import com.virtue.app.user.dto.MemberDto;
+import com.virtue.app.user.repository.MemberRepository;
+import com.virtue.app.user.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -60,12 +64,3 @@ public class MemberController {
 }
 
 
-class MemberDto {
-    public String username;
-    public String displayName;
-
-    MemberDto(String a, String b) {
-        this.username = a;
-        this.displayName = b;
-    }
-}

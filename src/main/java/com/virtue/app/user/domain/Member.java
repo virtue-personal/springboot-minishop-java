@@ -1,4 +1,4 @@
-package com.virtue.springbootweb.user;
+package com.virtue.app.user.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;

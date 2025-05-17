@@ -1,4 +1,4 @@
-package com.virtue.springbootweb.user;
+package com.virtue.app.common;
 
 
 import org.springframework.security.core.GrantedAuthority;

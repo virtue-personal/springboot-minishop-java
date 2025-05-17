@@ -1,4 +1,4 @@
-package com.virtue.springbootweb;
+package com.virtue.app;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

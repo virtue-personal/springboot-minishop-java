@@ -1,4 +1,4 @@
-package com.virtue.springbootweb.item;
+package com.virtue.app.common.util;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,8 +17,7 @@ public class S3Service {
     private String bucket;
     private final S3Presigner s3Presigner;
 
-    String createPresignedUrl(String path) {
-
+    public String createPresignedUrl(String path) {
         var putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucket)
                 .key(path)
