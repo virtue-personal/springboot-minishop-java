@@ -44,3 +44,8 @@ springdoc:
   api-docs:
     path: /v3/api-docs
   default-produces-media-type: application/json
+
+logging:
+  level:
+    org.springframework.web: INFO
+    com.virtue.app: DEBUG
