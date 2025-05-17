@@ -1,17 +1,23 @@
 package com.virtue.app.controller;
 
 import com.virtue.app.domain.CustomUser;
+import com.virtue.app.domain.Member;
+import com.virtue.app.domain.Sales;
 import com.virtue.app.dto.MemberDto;
 import com.virtue.app.repository.MemberRepository;
+import com.virtue.app.repository.SalesRepository;
 import com.virtue.app.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -19,6 +25,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final MemberRepository memberRepository;
+    private final SalesRepository salesRepository;
 
     @GetMapping("/register")
     public String register(Model model) {
@@ -47,9 +54,39 @@ public class MemberController {
     }
 
     @GetMapping("/mypage")
-    public String myPage(Authentication auth) {
-        CustomUser result = (CustomUser) auth.getPrincipal();
+    public String myPage(
+            @RequestParam(defaultValue = "1") int page,
+            Authentication auth, 
+            Model model) {
+        Member member = memberRepository.findByUsername(auth.getName())
+                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
+        
+        // 페이징 처리 (최근 주문순)
+        PageRequest pageRequest = PageRequest.of(page - 1, 5, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Sales> ordersPage = salesRepository.findByMember(member, pageRequest);
+        
+        model.addAttribute("orders", ordersPage);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", ordersPage.getTotalPages());
+        
         return "mypage";
+    }
+
+    @DeleteMapping("/order/{orderId}")
+    @ResponseBody
+    public ResponseEntity<String> deleteOrder(@PathVariable Long orderId, Authentication auth) {
+        Member member = memberRepository.findByUsername(auth.getName())
+                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
+        
+        Sales order = salesRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다."));
+        
+        if (!order.getMember().getId().equals(member.getId())) {
+            return ResponseEntity.status(403).body("권한이 없습니다.");
+        }
+        
+        salesRepository.deleteById(orderId);
+        return ResponseEntity.ok("주문이 삭제되었습니다.");
     }
 
     @GetMapping("/user/1")
