@@ -1,59 +1,1189 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       th:replace="~{layouts/default :: layout(~{::title}, ~{::content}, ~{::customCss}, ~{::customJs})}">
 <head>
     <title>이벤트 - 쇼핑몰</title>
     <th:block th:fragment="customCss">
+        <!-- Swiper CSS -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+        <!-- Flatpickr CSS -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
         <style>
             .event-wrapper {
                 min-height: calc(100vh - 72px);
                 padding: 2rem 0;
                 display: flex;
-                align-items: center;
                 justify-content: center;
             }
 
-            .empty-state {
-                text-align: center;
-                padding: 3rem;
+            .event-container {
+                width: 100%;
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 0 4rem;
+                position: relative;
             }
 
-            .empty-icon {
-                font-size: 4rem;
-                color: var(--bs-secondary);
-                margin-bottom: 1.5rem;
+            .swiper {
+                width: 100%;
+                margin: 2rem 0;
+                position: relative;
+                padding: 0 50px; /* 버튼을 위한 여백 추가 */
             }
 
-            .empty-title {
-                font-size: 1.5rem;
-                font-weight: 600;
-                color: var(--bs-secondary);
+            .swiper-slide {
+                height: auto;
+            }
+
+            .event-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 2rem;
+            }
+
+            .swiper-button-next,
+            .swiper-button-prev {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 40px;
+                height: 40px;
+                background-color: var(--bs-body-bg);
+                border: 1px solid var(--bs-border-color);
+                border-radius: 50%;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                color: var(--bs-primary);
+                z-index: 100;
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+            }
+
+            .swiper-button-next {
+                right: 0;
+            }
+
+            .swiper-button-prev {
+                left: 0;
+            }
+
+            .swiper-button-next::after,
+            .swiper-button-prev::after {
+                font-size: 1.2rem;
+                font-weight: bold;
+            }
+
+            .swiper-button-next:hover,
+            .swiper-button-prev:hover {
+                background-color: var(--bs-primary);
+                color: white;
+                border-color: var(--bs-primary);
+            }
+
+            .swiper-button-disabled {
+                opacity: 0.3;
+                cursor: not-allowed;
+            }
+
+            @media (max-width: 1200px) {
+                .event-container {
+                    padding: 0 3rem;
+                }
+
+                .swiper {
+                    padding: 0 40px;
+                }
+            }
+
+            @media (max-width: 768px) {
+                .event-container {
+                    padding: 0 1rem;
+                }
+
+                .swiper {
+                    padding: 0 35px;
+                }
+            }
+
+            .event-card {
+                background-color: var(--bs-body-bg);
+                border: 1px solid var(--bs-border-color);
+                border-radius: 1rem;
+                padding: 1.5rem;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                transition: transform 0.2s;
+                cursor: default;
+            }
+
+            .event-card:hover {
+                transform: translateY(-2px);
+            }
+
+            .event-image {
+                width: 100%;
+                height: 250px;
+                object-fit: cover;
+                border-radius: 0.5rem;
                 margin-bottom: 1rem;
             }
 
-            .empty-description {
+            .event-title {
+                font-size: 1.25rem;
+                font-weight: 600;
+                margin-bottom: 0.5rem;
+                color: var(--bs-body-color);
+            }
+
+            .event-description {
+                color: var(--bs-secondary-color);
+                margin-bottom: 1rem;
+                flex-grow: 1;
+            }
+
+            .event-date {
+                color: var(--bs-primary);
+                font-size: 0.9rem;
+                margin-bottom: 1rem;
+            }
+
+            .event-actions {
+                display: flex;
+                gap: 0.5rem;
+                justify-content: flex-end;
+                margin-top: auto;
+            }
+
+            .pagination-info {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+                margin-top: 2rem;
+                color: var(--bs-body-color);
+                font-size: 1.1rem;
+            }
+
+            .pagination-info .current {
+                color: var(--bs-primary);
+                font-weight: 600;
+            }
+
+            .pagination-info .separator {
                 color: var(--bs-secondary);
-                margin-bottom: 2rem;
+                margin: 0 0.2rem;
+            }
+
+            .pagination-info .total {
+                color: var(--bs-secondary);
+            }
+
+            @media (max-width: 992px) {
+                .event-grid {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+            }
+
+            .modal-body {
+                padding: 2rem;
+            }
+
+            .form-label {
+                font-weight: 500;
+                color: var(--bs-body-color);
+                margin-bottom: 0.5rem;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .validation-icon {
+                font-weight: bold;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 20px;
+                height: 20px;
+                line-height: 20px;
+                text-align: center;
+                border-radius: 50%;
+            }
+
+            .validation-icon i {
+                font-size: 16px;
+            }
+
+            .is-valid .validation-icon {
+                color: var(--bs-success);
+            }
+
+            .is-invalid .validation-icon {
+                color: var(--bs-danger);
+            }
+
+            .form-control {
+                border-radius: 0.5rem;
+                padding: 0.75rem 1rem;
+                border: 1px solid var(--bs-border-color);
+                background-color: var(--bs-body-bg);
+                color: var(--bs-body-color);
+            }
+
+            .form-control:focus {
+                border-color: var(--bs-primary);
+                box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+            }
+
+            /* 입력 필드의 유효성 검사 시각적 표시 제거 */
+            .form-control.is-valid,
+            .form-control.is-invalid {
+                border-color: var(--bs-border-color);
+                background-image: none;
+                padding-right: 0.75rem;
+            }
+
+            .form-control.is-valid:focus,
+            .form-control.is-invalid:focus {
+                border-color: var(--bs-primary);
+                box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+            }
+
+            .form-group {
+                position: relative;
+                margin-bottom: 1rem;
+            }
+
+            .validation-footer {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-top: 0.25rem;
+                min-height: 21px;
+            }
+
+            .validation-message {
+                font-size: 0.875rem;
+                color: var(--bs-danger);
+                display: none;
+            }
+
+            .is-invalid .validation-message {
+                display: block;
+            }
+
+            .char-counter {
+                font-size: 0.875rem;
+                color: var(--bs-secondary);
+                margin-left: auto;
+                flex-shrink: 0;
+            }
+
+            textarea.form-control {
+                min-height: 100px;
+                resize: none;
+            }
+
+            .preview-image {
+                width: 100%;
+                max-height: 300px;
+                object-fit: contain;
+                display: block;
+                transition: filter 0.3s ease;
+            }
+
+            .remove-image-btn {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0;
+                background-color: rgba(var(--bs-danger-rgb), 0.9);
+                color: white;
+                border: none;
+                border-radius: 0.5rem;
+                padding: 0.75rem 1.5rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                z-index: 1;
+            }
+
+            .image-preview-container:hover .remove-image-btn {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+
+            .image-preview-container:hover .preview-image {
+                filter: brightness(0.5);
+            }
+
+            .image-upload-container {
+                position: relative;
+                width: 100%;
+                min-height: 200px;
+                margin-top: 0.5rem;
+            }
+
+            .image-preview-container {
+                display: none;
+                width: 100%;
+                position: relative;
+                border-radius: 0.5rem;
+                overflow: hidden;
+                background-color: var(--bs-secondary-bg);
+            }
+
+            .image-placeholder {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                min-height: 200px;
+                background-color: var(--bs-secondary-bg);
+                border-radius: 0.5rem;
+                border: 2px dashed var(--bs-border-color);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                color: var(--bs-secondary);
+            }
+
+            .image-placeholder:hover {
+                background-color: var(--bs-secondary-bg-subtle);
+                border-color: var(--bs-primary);
+                color: var(--bs-primary);
+            }
+
+            .image-placeholder i {
+                font-size: 2.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .image-placeholder p {
+                margin: 0;
+            }
+
+            .has-image .image-preview-container {
+                display: block;
+            }
+
+            .has-image .image-placeholder {
+                display: none;
             }
         </style>
     </th:block>
 </head>
 <body>
-    <th:block th:fragment="content">
-        <div class="event-wrapper">
-            <div class="empty-state">
+<th:block th:fragment="content">
+    <div class="event-wrapper">
+        <div class="event-container">
+            <!-- 이벤트 등록 버튼 (로그인 사용자만) -->
+            <div class="d-flex justify-content-between mb-4">
+                <div class="d-flex gap-3">
+                    <h2 class="mb-0">이벤트 목록</h2>
+                    <span class="badge bg-primary d-flex align-items-center"
+                          th:text="${totalEvents + '개의 이벤트'}">0개의 이벤트</span>
+                </div>
+                <button sec:authorize="isAuthenticated()"
+                        class="btn btn-primary"
+                        data-bs-toggle="modal"
+                        data-bs-target="#eventModal">
+                    <i class="bi bi-plus-circle me-2"></i>새 이벤트 등록
+                </button>
+            </div>
+
+            <!-- 이벤트 목록 -->
+            <div th:if="${not #lists.isEmpty(events)}" class="swiper mySwiper">
+                <div class="swiper-wrapper">
+                    <div th:each="event : ${events}" class="swiper-slide">
+                        <div class="event-card">
+                            <img th:src="${event.imgUrl != null and !event.imgUrl.isEmpty()} ? ${event.imgUrl} : 'https://placehold.co/300'"
+                                 class="event-image" th:alt="${event.title}">
+                            <h3 class="event-title" th:text="${event.title}">이벤트 제목</h3>
+                            <p class="event-date" th:if="${event.date}" th:text="${event.date}">이벤트 기간</p>
+                            <p class="event-description" th:text="${event.description}">이벤트 설명</p>
+                            <div class="event-actions" sec:authorize="isAuthenticated()">
+                                <button class="btn btn-outline-primary btn-sm"
+                                        th:data-id="${event.id}"
+                                        th:data-title="${event.title}"
+                                        th:data-description="${event.description}"
+                                        th:data-date="${event.date}"
+                                        th:data-img-url="${event.imgUrl}"
+                                        onclick="editEvent(this)">
+                                    <i class="bi bi-pencil me-1"></i>수정
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm"
+                                        th:onclick="'deleteEvent(' + ${event.id} + ')'">
+                                    <i class="bi bi-trash me-1"></i>삭제
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+            </div>
+
+            <!-- 페이지 정보 -->
+            <div class="pagination-info">
+                <span class="current">1</span>
+                <span class="separator">/</span>
+                <span class="total">1</span>
+            </div>
+
+            <!-- 이벤트가 없을 때 -->
+            <div th:if="${#lists.isEmpty(events)}" class="empty-state">
                 <div class="empty-icon">
                     <i class="bi bi-calendar-x"></i>
                 </div>
-                <h2 class="empty-title">그런거 없습니다</h2>
-                <p class="empty-description">언젠가는 꼭 새로운 이벤트로 찾아뵙겠습니다!</p>
-                <a href="/" class="btn btn-primary">
-                    <i class="bi bi-house-door me-2"></i>홈으로 돌아가기
-                </a>
+                <h2 class="empty-title">등록된 이벤트가 없습니다</h2>
+                <p class="empty-description">곧 새로운 이벤트가 등록될 예정입니다!</p>
             </div>
         </div>
-    </th:block>
+    </div>
 
-    <th:block th:fragment="customJs"></th:block>
+    <!-- 이벤트 등록/수정 모달 -->
+    <div class="modal fade" id="eventModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="modalTitle">새 이벤트 등록</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="eventForm" class="needs-validation" novalidate>
+                        <input type="hidden" id="eventId">
+                        <!-- 제목 -->
+                        <div class="form-group">
+                            <label for="title" class="form-label">
+                                이벤트 제목
+                                <span class="validation-icon"></span>
+                            </label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="title"
+                                   placeholder="이벤트 제목 (2-20자)">
+                            <div class="validation-footer">
+                                <div class="validation-message">이벤트 제목은 2-20자 사이로 입력해주세요.</div>
+                                <div class="char-counter">0/20</div>
+                            </div>
+                        </div>
+
+                        <!-- 기간 -->
+                        <div class="mb-4">
+                            <label for="date" class="form-label">이벤트 기간</label>
+                            <div class="date-type-selector btn-group w-100 mb-2">
+                                <input type="radio" class="btn-check" name="dateType" id="singleDate" value="single"
+                                       checked>
+                                <label class="btn btn-outline-primary" for="singleDate">단일 날짜</label>
+                                <input type="radio" class="btn-check" name="dateType" id="dateRange" value="range">
+                                <label class="btn btn-outline-primary" for="dateRange">기간 선택</label>
+                            </div>
+                            <input type="text"
+                                   class="form-control"
+                                   id="date"
+                                   placeholder="이벤트 기간을 선택해주세요"
+                                   readonly>
+                            <div class="validation-message">
+                                이벤트 기간을 선택해주세요.
+                            </div>
+                        </div>
+
+                        <!-- 설명 -->
+                        <div class="form-group">
+                            <label for="description" class="form-label">
+                                이벤트 설명
+                                <span class="validation-icon"></span>
+                            </label>
+                            <textarea class="form-control"
+                                      id="description"
+                                      placeholder="이벤트 설명 (최대 50자)"></textarea>
+                            <div class="validation-footer">
+                                <div class="validation-message">이벤트 설명은 50자 이내로 입력해주세요.</div>
+                                <div class="char-counter">0/50</div>
+                            </div>
+                        </div>
+
+                        <!-- 이미지 -->
+                        <div class="mb-4">
+                            <label class="form-label">이벤트 이미지</label>
+                            <input type="file"
+                                   class="form-control d-none"
+                                   id="image"
+                                   accept="image/*"
+                                   onchange="handleImageSelect(this, 'imagePreview')">
+
+                            <!-- 이미지 미리보기 -->
+                            <div id="imagePreview" class="image-upload-container">
+                                <div class="image-preview-container">
+                                    <img class="preview-image" alt="이벤트 이미지">
+                                    <button type="button" class="remove-image-btn"
+                                            onclick="handleImageRemove('image', 'imagePreview', 'imgUrl')">
+                                        <i class="bi bi-trash me-2"></i>이미지 제거
+                                    </button>
+                                </div>
+                                <div class="image-placeholder" onclick="document.getElementById('image').click()">
+                                    <i class="bi bi-image-fill"></i>
+                                    <p class="mb-1">이미지를 업로드하세요</p>
+                                    <p class="text-secondary small mb-0">클릭하여 이미지 선택</p>
+                                </div>
+                            </div>
+
+                            <!-- 업로드된 이미지 URL (숨김) -->
+                            <input type="hidden" id="imgUrl">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-top-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary px-4" onclick="saveEvent()">저장</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 이벤트 수정 모달 -->
+    <div class="modal fade" id="eventEditModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h5 class="modal-title fw-bold">이벤트 수정</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="eventEditForm" class="needs-validation" novalidate>
+                        <input type="hidden" id="editEventId">
+
+                        <!-- 수정 폼 제목 -->
+                        <div class="form-group">
+                            <label for="editTitle" class="form-label">
+                                이벤트 제목
+                                <span class="validation-icon"></span>
+                            </label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="editTitle"
+                                   placeholder="이벤트 제목 (2-20자)">
+                            <div class="validation-footer">
+                                <div class="validation-message">이벤트 제목은 2-20자 사이로 입력해주세요.</div>
+                                <div class="char-counter">0/20</div>
+                            </div>
+                        </div>
+
+                        <!-- 수정 폼 기간 -->
+                        <div class="mb-4">
+                            <label for="editDate" class="form-label">이벤트 기간</label>
+                            <div class="date-type-selector btn-group w-100 mb-2">
+                                <input type="radio" class="btn-check" name="editDateType" id="editSingleDate"
+                                       value="single" checked>
+                                <label class="btn btn-outline-primary" for="editSingleDate">단일 날짜</label>
+                                <input type="radio" class="btn-check" name="editDateType" id="editDateRange"
+                                       value="range">
+                                <label class="btn btn-outline-primary" for="editDateRange">기간 선택</label>
+                            </div>
+                            <input type="text"
+                                   class="form-control"
+                                   id="editDate"
+                                   placeholder="이벤트 기간을 선택해주세요"
+                                   readonly>
+                            <div class="validation-message">
+                                이벤트 기간을 선택해주세요.
+                            </div>
+                        </div>
+
+                        <!-- 수정 폼 설명 -->
+                        <div class="form-group">
+                            <label for="editDescription" class="form-label">
+                                이벤트 설명
+                                <span class="validation-icon"></span>
+                            </label>
+                            <textarea class="form-control"
+                                      id="editDescription"
+                                      placeholder="이벤트 설명 (최대 50자)"></textarea>
+                            <div class="validation-footer">
+                                <div class="validation-message">이벤트 설명은 50자 이내로 입력해주세요.</div>
+                                <div class="char-counter">0/50</div>
+                            </div>
+                        </div>
+
+                        <!-- 이미지 -->
+                        <div class="mb-4">
+                            <label class="form-label">이벤트 이미지</label>
+                            <input type="file"
+                                   class="form-control d-none"
+                                   id="editImage"
+                                   accept="image/*"
+                                   onchange="handleImageSelect(this, 'editImagePreview')">
+
+                            <!-- 이미지 미리보기 -->
+                            <div id="editImagePreview" class="image-upload-container">
+                                <div class="image-preview-container">
+                                    <img class="preview-image" alt="이벤트 이미지">
+                                    <button type="button" class="remove-image-btn"
+                                            onclick="handleImageRemove('editImage', 'editImagePreview', 'editImgUrl')">
+                                        <i class="bi bi-trash me-2"></i>이미지 제거
+                                    </button>
+                                </div>
+                                <div class="image-placeholder" onclick="document.getElementById('editImage').click()">
+                                    <i class="bi bi-image-fill"></i>
+                                    <p class="mb-1">이미지를 업로드하세요</p>
+                                    <p class="text-secondary small mb-0">클릭하여 이미지 선택</p>
+                                </div>
+                            </div>
+
+                            <!-- 업로드된 이미지 URL (숨김) -->
+                            <input type="hidden" id="editImgUrl">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-top-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary px-4" onclick="updateEvent()">저장</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="customJs">
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+    <script th:inline="javascript">
+        // 모달 초기화
+        const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+        const eventEditModal = new bootstrap.Modal(document.getElementById('eventEditModal'));
+        let flatpickrInstance;
+        let editFlatpickrInstance;
+
+        // 등록 모달이 열릴 때 Flatpickr 초기화
+        document.getElementById('eventModal').addEventListener('show.bs.modal', function () {
+            initFlatpickr('single');
+        });
+
+        // 수정 모달이 열릴 때 Flatpickr 초기화
+        document.getElementById('eventEditModal').addEventListener('show.bs.modal', function () {
+            initEditFlatpickr('single');
+        });
+
+        // Flatpickr 초기화 함수 (등록)
+        function initFlatpickr(mode) {
+            if (flatpickrInstance) {
+                flatpickrInstance.destroy();
+            }
+
+            const config = {
+                locale: "ko",
+                dateFormat: "Y.m.d",
+                minDate: "today",
+                disableMobile: "true",
+                onChange: function (selectedDates) {
+                    const dateInput = document.getElementById('date');
+                    if ((mode === 'single' && selectedDates.length === 1) ||
+                        (mode === 'range' && selectedDates.length === 2)) {
+                        dateInput.classList.remove('is-invalid');
+                    }
+                }
+            };
+
+            if (mode === 'range') {
+                config.mode = 'range';
+            }
+
+            flatpickrInstance = flatpickr("#date", config);
+        }
+
+        // Flatpickr 초기화 함수 (수정)
+        function initEditFlatpickr(mode) {
+            if (editFlatpickrInstance) {
+                editFlatpickrInstance.destroy();
+            }
+
+            const config = {
+                locale: "ko",
+                dateFormat: "Y.m.d",
+                minDate: "today",
+                disableMobile: "true",
+                onChange: function (selectedDates) {
+                    const dateInput = document.getElementById('editDate');
+                    if ((mode === 'single' && selectedDates.length === 1) ||
+                        (mode === 'range' && selectedDates.length === 2)) {
+                        dateInput.classList.remove('is-invalid');
+                    }
+                }
+            };
+
+            if (mode === 'range') {
+                config.mode = 'range';
+            }
+
+            editFlatpickrInstance = flatpickr("#editDate", config);
+        }
+
+        // 날짜 선택 모드 변경 이벤트 (등록)
+        document.querySelectorAll('input[name="dateType"]').forEach(radio => {
+            radio.addEventListener('change', function () {
+                initFlatpickr(this.value);
+            });
+        });
+
+        // 날짜 선택 모드 변경 이벤트 (수정)
+        document.querySelectorAll('input[name="editDateType"]').forEach(radio => {
+            radio.addEventListener('change', function () {
+                initEditFlatpickr(this.value);
+            });
+        });
+
+        // 실시간 글자 수 표시와 유효성 검사
+        function validateInput(input) {
+            const container = input.closest('.form-group');
+            const counter = container.querySelector('.char-counter');
+            const validationIcon = container.querySelector('.validation-icon');
+            const length = input.value.length;
+            const isDescription = input.id.includes('description') || input.id.includes('Description');
+            const maxLength = isDescription ? 50 : 20;
+            const minLength = isDescription ? 0 : 2;
+
+            // 글자 수 카운터 업데이트
+            counter.textContent = `${length}/${maxLength}`;
+
+            // 유효성 검사 (아이콘만 업데이트)
+            if (length >= minLength && length <= maxLength) {
+                container.classList.remove('is-invalid');
+                container.classList.add('is-valid');
+                validationIcon.innerHTML = '✓';
+            } else {
+                container.classList.remove('is-valid');
+                container.classList.add('is-invalid');
+                validationIcon.innerHTML = '<i class="bi bi-info-circle"></i>';
+            }
+        }
+
+        // 입력 필드 이벤트 리스너 등록
+        document.addEventListener('DOMContentLoaded', function () {
+            // 모든 입력 필드에 대한 초기화 및 이벤트 리스너 등록
+            ['title', 'description', 'editTitle', 'editDescription'].forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    // 초기 글자 수 표시
+                    validateInput(input);
+
+                    // input 이벤트에 대한 리스너
+                    input.addEventListener('input', function () {
+                        validateInput(this);
+                    });
+
+                    // paste 이벤트에 대한 리스너
+                    input.addEventListener('paste', function () {
+                        setTimeout(() => validateInput(this), 0);
+                    });
+
+                    // keyup 이벤트에 대한 리스너 추가
+                    input.addEventListener('keyup', function () {
+                        validateInput(this);
+                    });
+                }
+            });
+        });
+
+        // 모달이 열릴 때 초기 글자 수 표시
+        document.getElementById('eventModal').addEventListener('shown.bs.modal', function () {
+            ['title', 'description'].forEach(id => {
+                const input = document.getElementById(id);
+                if (input) validateInput(input);
+            });
+        });
+
+        document.getElementById('eventEditModal').addEventListener('shown.bs.modal', function () {
+            ['editTitle', 'editDescription'].forEach(id => {
+                const input = document.getElementById(id);
+                if (input) validateInput(input);
+            });
+        });
+
+        // 폼 유효성 검사 (등록)
+        function validateForm() {
+            const title = document.getElementById('title');
+            const description = document.getElementById('description');
+            const date = document.getElementById('date');
+            const dateType = document.querySelector('input[name="dateType"]:checked').value;
+            let errorMessages = [];
+
+            if (!title.value || title.value.length < 2 || title.value.length > 20) {
+                errorMessages.push('이벤트 제목은 2-20자 사이로 입력해주세요.');
+            }
+
+            if (!description.value || description.value.length > 50) {
+                errorMessages.push('이벤트 설명은 50자 이내로 입력해주세요.');
+            }
+
+            if (!date.value) {
+                errorMessages.push('이벤트 기간을 선택해주세요.');
+            } else if (dateType === 'range' && !date.value.includes(' ~ ')) {
+                errorMessages.push('기간 선택 모드에서는 시작일과 종료일을 모두 선택해주세요.');
+            }
+
+            if (errorMessages.length > 0) {
+                alert('다음 항목을 확인해주세요:\n\n• ' + errorMessages.join('\n• '));
+                return false;
+            }
+
+            return true;
+        }
+
+        // 이벤트 저장
+        async function saveEvent() {
+            if (!validateForm()) {
+                return;
+            }
+
+            const id = document.getElementById('eventId').value;
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+            const date = document.getElementById('date').value;
+            const imgUrl = document.getElementById('imgUrl').value;
+
+            try {
+                const response = await fetch('/api/events' + (id ? '/' + id : ''), {
+                    method: id ? 'PUT' : 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({title, description, date, imgUrl})
+                });
+
+                if (response.ok) {
+                    eventModal.hide();
+                    location.reload();
+                } else {
+                    const error = await response.text();
+                    alert('이벤트 저장 중 오류가 발생했습니다.\n' + error);
+                }
+            } catch (error) {
+                console.error('이벤트 저장 에러:', error);
+                alert('이벤트 저장 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 수정 폼 유효성 검사
+        function validateEditForm() {
+            const title = document.getElementById('editTitle');
+            const description = document.getElementById('editDescription');
+            const date = document.getElementById('editDate');
+            const dateType = document.querySelector('input[name="editDateType"]:checked').value;
+            let errorMessages = [];
+
+            // 제목 검사
+            if (!title.value || title.value.length < 2 || title.value.length > 20) {
+                errorMessages.push('이벤트 제목은 2-20자 사이로 입력해주세요.');
+            }
+
+            // 설명 검사
+            if (!description.value || description.value.length > 50) {
+                errorMessages.push('이벤트 설명은 50자 이내로 입력해주세요.');
+            }
+
+            // 날짜 검사
+            if (!date.value) {
+                errorMessages.push('이벤트 기간을 선택해주세요.');
+            } else if (dateType === 'range' && !date.value.includes(' ~ ')) {
+                errorMessages.push('기간 선택 모드에서는 시작일과 종료일을 모두 선택해주세요.');
+            }
+
+            if (errorMessages.length > 0) {
+                alert('다음 항목을 확인해주세요:\n\n• ' + errorMessages.join('\n• '));
+                return false;
+            }
+
+            return true;
+        }
+
+        // 이벤트 수정
+        async function updateEvent() {
+            if (!validateEditForm()) {
+                return;
+            }
+
+            const id = document.getElementById('editEventId').value;
+            const title = document.getElementById('editTitle').value;
+            const description = document.getElementById('editDescription').value;
+            const date = document.getElementById('editDate').value;
+            const imgUrl = document.getElementById('editImgUrl').value;
+
+            try {
+                const response = await fetch(`/api/events/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({title, description, date, imgUrl})
+                });
+
+                if (response.ok) {
+                    eventEditModal.hide();
+                    location.reload();
+                } else {
+                    const error = await response.text();
+                    alert('이벤트 수정 중 오류가 발생했습니다.');
+                }
+            } catch (error) {
+                console.error('이벤트 수정 에러:', error);
+                alert('이벤트 수정 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 이벤트 수정 함수
+        function editEvent(button) {
+            const id = button.dataset.id;
+            const title = button.dataset.title;
+            const description = button.dataset.description;
+            const date = button.dataset.date;
+            const imgUrl = button.dataset.imgUrl;
+
+            document.getElementById('editEventId').value = id;
+            document.getElementById('editTitle').value = title;
+            document.getElementById('editDescription').value = description;
+            document.getElementById('editDate').value = date || '';
+            document.getElementById('editImgUrl').value = imgUrl || '';
+
+            // 입력 필드 유효성 검사 상태 초기화
+            ['editTitle', 'editDescription'].forEach(id => {
+                const input = document.getElementById(id);
+                if (input) validateInput(input);
+            });
+
+            // 이미지 미리보기 설정
+            const container = document.getElementById('editImagePreview');
+            const previewImage = container.querySelector('.preview-image');
+
+            if (imgUrl) {
+                previewImage.src = imgUrl;
+                container.classList.add('has-image');
+            } else {
+                previewImage.src = '';
+                container.classList.remove('has-image');
+            }
+
+            eventEditModal.show();
+        }
+
+        // 이벤트 삭제 함수
+        async function deleteEvent(id) {
+            if (!confirm('이벤트를 삭제하시겠습니까?')) return;
+
+            try {
+                const response = await fetch(`/api/events/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    const error = await response.text();
+                    alert(error || '이벤트 삭제 중 오류가 발생했습니다.');
+                }
+            } catch (error) {
+                console.error('이벤트 삭제 에러:', error);
+                alert('이벤트 삭제 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 이미지 선택 처리 함수
+        async function handleImageSelect(input, previewContainerId) {
+            const container = document.getElementById(previewContainerId);
+            const previewImage = container.querySelector('.preview-image');
+            const urlInput = document.getElementById(previewContainerId === 'imagePreview' ? 'imgUrl' : 'editImgUrl');
+
+            if (!input.files || !input.files[0]) return;
+
+            const file = input.files[0];
+
+            // 파일 크기 체크
+            if (file.size > 5 * 1024 * 1024) {
+                alert('이미지 크기는 5MB를 초과할 수 없습니다.');
+                input.value = '';
+                return;
+            }
+
+            try {
+                // 즉시 미리보기 표시
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    previewImage.src = e.target.result;
+                    container.classList.add('has-image');
+                };
+                reader.readAsDataURL(file);
+
+                // 서버에 업로드
+                const filename = file.name;
+                const response = await fetch(`/event/presigned-url?filename=${encodeURIComponent(filename)}`);
+                const presignedUrl = await response.text();
+
+                await fetch(presignedUrl, {
+                    method: 'PUT',
+                    body: file,
+                    headers: {
+                        'Content-Type': file.type
+                    }
+                });
+
+                // 업로드된 URL 저장
+                const imageUrl = presignedUrl.split('?')[0];
+                urlInput.value = imageUrl;
+            } catch (error) {
+                console.error('이미지 업로드 에러:', error);
+                alert('이미지 업로드 중 오류가 발생했습니다.');
+                handleImageRemove(input.id, previewContainerId, urlInput.id);
+            }
+        }
+
+        // 이미지 제거 처리 함수
+        function handleImageRemove(inputId, containerId, urlInputId) {
+            const input = document.getElementById(inputId);
+            const container = document.getElementById(containerId);
+            const urlInput = document.getElementById(urlInputId);
+            const previewImage = container.querySelector('.preview-image');
+
+            input.value = '';
+            urlInput.value = '';
+            previewImage.src = '';
+            container.classList.remove('has-image');
+        }
+
+        // Swiper 초기화
+        const swiper = new Swiper(".mySwiper", {
+            slidesPerView: 3,
+            spaceBetween: 30,
+            slidesPerGroup: 3,
+            loop: true,
+            loopFillGroupWithBlank: true,
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+            grabCursor: true,
+            breakpoints: {
+                0: {
+                    slidesPerView: 1,
+                    spaceBetween: 20,
+                    slidesPerGroup: 1,
+                },
+                768: {
+                    slidesPerView: 2,
+                    spaceBetween: 20,
+                    slidesPerGroup: 2,
+                },
+                992: {
+                    slidesPerView: 3,
+                    spaceBetween: 30,
+                    slidesPerGroup: 3,
+                }
+            },
+            watchOverflow: true,
+            speed: 400,
+            effect: "slide",
+            observer: true,
+            observeParents: true,
+            on: {
+                init: function () {
+                    updatePagination(this);
+                },
+                slideChange: function () {
+                    updatePagination(this);
+                }
+            }
+        });
+
+        // 페이지네이션 업데이트 함수
+        function updatePagination(swiper) {
+            const totalSlides = document.querySelectorAll('.swiper-slide:not(.swiper-slide-duplicate)').length;
+            const itemsPerPage = swiper.params.breakpoints[992].slidesPerView;  // 데스크톱 기준 slidesPerView
+            const totalPages = Math.ceil(totalSlides / itemsPerPage);
+
+            // realIndex는 0부터 시작하므로 1을 더해줍니다
+            let currentPage = Math.floor(swiper.realIndex / itemsPerPage) + 1;
+
+            // loop 모드에서 마지막 페이지를 넘어갔을 때 처리
+            if (currentPage > totalPages) {
+                currentPage = 1;
+            }
+
+            document.querySelector('.pagination-info .current').textContent = currentPage;
+            document.querySelector('.pagination-info .total').textContent = totalPages;
+        }
+
+        // 모달이 닫힐 때 초기화
+        document.getElementById('eventModal').addEventListener('hidden.bs.modal', function () {
+            if (flatpickrInstance) {
+                flatpickrInstance.destroy();
+            }
+            document.getElementById('eventForm').reset();
+            document.getElementById('eventId').value = '';
+            handleImageRemove('image', 'imagePreview', 'imgUrl');
+
+            // 유효성 검사 상태 초기화
+            const containers = this.querySelectorAll('.form-group');
+            containers.forEach(container => {
+                container.classList.remove('is-valid', 'is-invalid');
+                const validationIcon = container.querySelector('.validation-icon');
+                const charCounter = container.querySelector('.char-counter');
+                const input = container.querySelector('input, textarea');
+                if (validationIcon) validationIcon.innerHTML = '';
+                if (charCounter) {
+                    const isDescription = input && (input.id.includes('description') || input.id.includes('Description'));
+                    const maxLength = isDescription ? '50' : '20';
+                    charCounter.textContent = `0/${maxLength}`;
+                }
+            });
+        });
+
+        // 수정 모달이 닫힐 때 초기화
+        document.getElementById('eventEditModal').addEventListener('hidden.bs.modal', function () {
+            if (editFlatpickrInstance) {
+                editFlatpickrInstance.destroy();
+            }
+            document.getElementById('eventEditForm').reset();
+            document.getElementById('editEventId').value = '';
+            handleImageRemove('editImage', 'editImagePreview', 'editImgUrl');
+
+            // 유효성 검사 상태 초기화
+            const containers = this.querySelectorAll('.form-group');
+            containers.forEach(container => {
+                container.classList.remove('is-valid', 'is-invalid');
+                const validationIcon = container.querySelector('.validation-icon');
+                const charCounter = container.querySelector('.char-counter');
+                const input = container.querySelector('input, textarea');
+                if (validationIcon) validationIcon.innerHTML = '';
+                if (charCounter) {
+                    const isDescription = input && (input.id.includes('description') || input.id.includes('Description'));
+                    const maxLength = isDescription ? '50' : '20';
+                    charCounter.textContent = `0/${maxLength}`;
+                }
+            });
+        });
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function () {
+            const imagePreviewElements = document.querySelectorAll('#imagePreview, #editImagePreview');
+            imagePreviewElements.forEach(preview => {
+                const imgUrl = preview.querySelector('input[type="hidden"]').value;
+                if (imgUrl) {
+                    preview.classList.add('has-image');
+                } else {
+                    preview.classList.remove('has-image');
+                }
+            });
+        });
+    </script>
+</th:block>
 </body>
 </html>
