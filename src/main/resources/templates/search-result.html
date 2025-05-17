@@ -3,16 +3,32 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       th:replace="~{layouts/default :: layout(~{::title}, ~{::content}, ~{::customCss}, ~{::customJs})}">
 <head>
-    <title>상품 목록 - 쇼핑몰</title>
+    <title>검색 결과 - 쇼핑몰</title>
     <th:block th:fragment="customCss">
-    <style>
-            .list-wrapper {
+        <style>
+            .search-result-wrapper {
                 padding: 2rem 0;
                 min-height: calc(100vh - 72px);
             }
 
-            .search-form {
+            .search-header {
                 margin-bottom: 2rem;
+                padding: 0.5rem 0;
+            }
+
+            .search-term {
+                color: var(--bs-primary);
+                font-weight: bold;
+            }
+
+            .search-count {
+                color: var(--bs-secondary);
+                font-size: 0.9rem;
+                margin-top: 0.5rem;
+            }
+
+            .search-form {
+                margin: 2rem 0;
             }
 
             .search-input-group {
@@ -31,14 +47,6 @@
             .card:hover {
                 transform: translateY(-5px);
                 box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
-            }
-
-            [data-bs-theme="dark"] .card {
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-            }
-
-            [data-bs-theme="dark"] .card:hover {
-                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
             }
 
             .card-img-top {
@@ -63,21 +71,15 @@
                 color: var(--bs-primary);
             }
 
-            .btn-action {
-                padding: 0.5rem 1rem;
-                border-radius: 0.5rem;
-                transition: all 0.3s ease;
+            .no-results {
+                text-align: center;
+                padding: 3rem;
             }
 
-            .card-link {
-                text-decoration: none;
-                color: inherit;
-                display: block;
-                height: 100%;
-            }
-
-            .card-link:hover {
-                color: inherit;
+            .no-results-icon {
+                font-size: 4rem;
+                color: var(--bs-secondary);
+                margin-bottom: 1rem;
             }
 
             .pagination {
@@ -95,23 +97,39 @@
                 background-color: var(--bs-primary);
             }
 
-            .empty-state {
-                text-align: center;
-                padding: 3rem;
+            .card-link {
+                text-decoration: none;
+                color: inherit;
+                display: block;
+                height: 100%;
             }
 
-            .empty-state-icon {
-                font-size: 4rem;
-                color: var(--bs-secondary);
-                margin-bottom: 1rem;
+            .card-link:hover {
+                color: inherit;
+            }
+
+            .btn-action {
+                padding: 0.5rem 1rem;
+                border-radius: 0.5rem;
+                transition: all 0.3s ease;
             }
         </style>
     </th:block>
 </head>
 <body>
     <th:block th:fragment="content">
-        <div class="list-wrapper">
+        <div class="search-result-wrapper">
             <div class="container">
+                <!-- 검색 결과 헤더 -->
+                <div class="search-header">
+                    <h2 class="mb-2">
+                        "<span class="search-term" th:text="${searchText}">검색어</span>" 검색 결과
+                    </h2>
+                    <p class="search-count mb-0">
+                        총 <span th:text="${items.totalElements}">0</span>개의 상품을 찾았습니다
+                    </p>
+                </div>
+
                 <!-- 검색 폼 -->
                 <div class="search-form">
                     <form action="/search" method="GET" class="search-input-group">
@@ -124,45 +142,26 @@
                             <button class="btn btn-primary" type="submit">
                                 <i class="bi bi-search me-2"></i>검색
                             </button>
+                            <a href="/list" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-counterclockwise"></i>
+                            </a>
                         </div>
                     </form>
                 </div>
 
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div class="d-flex align-items-center gap-3">
-                        <h2 class="mb-0">상품 목록</h2>
-                        <a th:href="@{/list/{page}(page=${items.number + 1}, sort=${currentSort == 'desc' ? 'asc' : 'desc'}, searchText=${searchText})}"
-                           class="btn btn-outline-primary d-flex align-items-center gap-2">
-                            <i class="bi" th:classappend="${currentSort == 'desc' ? 'bi-sort-numeric-down' : 'bi-sort-numeric-up'}"></i>
-                            <span th:text="${currentSort == 'desc' ? '최신순' : '오래된순'}">정렬</span>
-                        </a>
+                <!-- 검색 결과가 없을 때 -->
+                <div th:if="${items.empty}" class="no-results">
+                    <div class="no-results-icon">
+                        <i class="bi bi-search"></i>
                     </div>
-                    <a href="/write" class="btn btn-primary" sec:authorize="isAuthenticated()">
-                        <i class="bi bi-plus-lg me-2"></i>상품 등록
+                    <h3>검색 결과가 없습니다</h3>
+                    <p class="text-muted">다른 검색어로 시도해보세요</p>
+                    <a href="/list" class="btn btn-primary">
+                        <i class="bi bi-shop me-2"></i>전체 상품 보기
                     </a>
                 </div>
 
-                <!-- 상품이 없을 때 표시할 내용 -->
-                <div th:if="${items.empty}" class="empty-state">
-                    <div class="empty-state-icon">
-                        <i class="bi bi-bag-x"></i>
-                    </div>
-                    <h3>등록된 상품이 없습니다</h3>
-                    <p class="text-muted" sec:authorize="!isAuthenticated()">로그인 후 상품을 등록할 수 있습니다.</p>
-                    <p class="text-muted" sec:authorize="isAuthenticated()">첫 번째 상품을 등록해보세요!</p>
-                    <div sec:authorize="isAuthenticated()">
-                        <a href="/write" class="btn btn-primary">
-                            <i class="bi bi-plus-lg me-2"></i>상품 등록하기
-                        </a>
-                    </div>
-                    <div sec:authorize="!isAuthenticated()">
-                        <a href="/login" class="btn btn-primary">
-                            <i class="bi bi-box-arrow-in-right me-2"></i>로그인하기
-                        </a>
-                    </div>
-                </div>
-
-                <!-- 상품 목록 -->
+                <!-- 검색 결과 목록 -->
                 <div class="row g-4" th:if="${!items.empty}">
                     <div class="col-md-4" th:each="item : ${items.content}">
                         <div class="card h-100">
@@ -195,24 +194,13 @@
                     <ul class="pagination justify-content-center">
                         <li class="page-item" th:classappend="${items.first} ? 'disabled'">
                             <a class="page-link" 
-                               th:href="@{/list/{page}(page=${items.number}, sort=${currentSort}, searchText=${searchText})}"
-                               aria-label="이전">
+                               th:href="@{/search(searchText=${searchText}, page=${items.number}, sort=${currentSort})}">
                                 <i class="bi bi-chevron-left"></i>
                             </a>
                         </li>
-
-                        <li class="page-item"
-                            th:each="i : ${#numbers.sequence(1, items.totalPages)}"
-                            th:classappend="${items.number + 1 == i} ? 'active'">
-                            <a class="page-link" 
-                               th:href="@{/list/{page}(page=${i}, sort=${currentSort}, searchText=${searchText})}" 
-                               th:text="${i}"></a>
-                        </li>
-
                         <li class="page-item" th:classappend="${items.last} ? 'disabled'">
                             <a class="page-link" 
-                               th:href="@{/list/{page}(page=${items.number + 2}, sort=${currentSort}, searchText=${searchText})}"
-                               aria-label="다음">
+                               th:href="@{/search(searchText=${searchText}, page=${items.number + 2}, sort=${currentSort})}">
                                 <i class="bi bi-chevron-right"></i>
                             </a>
                         </li>
@@ -225,21 +213,16 @@
     <th:block th:fragment="customJs">
         <script>
             function deleteItem(id) {
-                if (confirm('정말로 이 상품을 삭제하시겠습니까?')) {
-                    fetch(`/item?id=${id}`, { 
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
+                if (confirm('정말 삭제하시겠습니까?')) {
+                    fetch('/item?id=' + id, {
+                        method: 'DELETE'
                     })
-                    .then(response => {
-                        if (response.ok) {
+                    .then((response) => {
+                        if (response.status === 200) {
                             location.reload();
-                        } else {
-                            alert('삭제 중 오류가 발생했습니다.');
                         }
                     })
-                    .catch(error => {
+                    .catch((error) => {
                         console.error('Error:', error);
                         alert('삭제 중 오류가 발생했습니다.');
                     });
@@ -248,4 +231,4 @@
         </script>
     </th:block>
 </body>
-</html>
+</html> 

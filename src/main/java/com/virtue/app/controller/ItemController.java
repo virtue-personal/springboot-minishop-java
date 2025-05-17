@@ -35,14 +35,22 @@ public class ItemController {
     @GetMapping("/list/{pageNum}")
     String getListPage(Model model, 
                       @PathVariable Integer pageNum,
-                      @RequestParam(required = false, defaultValue = "desc") String sort) {
+                      @RequestParam(required = false, defaultValue = "desc") String sort,
+                      @RequestParam(required = false) String searchText) {
         Sort.Direction direction = sort.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
-        Page<Item> result = itemRepository.findPageBy(
-            PageRequest.of(pageNum - 1, 6, Sort.by(direction, "id"))
-        );
+        PageRequest pageRequest = PageRequest.of(pageNum - 1, 6, Sort.by(direction, "id"));
+        
+        Page<Item> result;
+        if (searchText != null && !searchText.trim().isEmpty()) {
+            result = itemRepository.searchByTitleWithPaging(searchText.trim(), pageRequest);
+        } else {
+            result = itemRepository.findPageBy(pageRequest);
+        }
+
         model.addAttribute("items", result);
         model.addAttribute("currentSort", sort);
-        return "list.html";
+        model.addAttribute("searchText", searchText);
+        return "list";
     }
 
     @GetMapping("/write")
@@ -126,10 +134,29 @@ public class ItemController {
     }
 
     @PostMapping("/search")
-    public String postSearch(@RequestParam String searchText) {
+    String search(@RequestParam String searchText,
+                 @RequestParam(required = false, defaultValue = "1") Integer page,
+                 @RequestParam(required = false, defaultValue = "desc") String sort,
+                 Model model) {
+        
+        Sort.Direction direction = sort.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        PageRequest pageRequest = PageRequest.of(page - 1, 6, Sort.by(direction, "id"));
+        
+        Page<Item> result = itemRepository.searchByTitleWithPaging(searchText.trim(), pageRequest);
+        
+        model.addAttribute("items", result);
+        model.addAttribute("currentSort", sort);
+        model.addAttribute("searchText", searchText);
+        
+        return "search-result";
+    }
 
-//        var result = itemRepository.rawQuery1(searchText);
-//        System.out.println(result);
-        return "list";
+    @GetMapping("/search")
+    String searchPage(@RequestParam String searchText,
+                     @RequestParam(required = false, defaultValue = "1") Integer page,
+                     @RequestParam(required = false, defaultValue = "desc") String sort,
+                     Model model) {
+        
+        return search(searchText, page, sort, model);
     }
 }

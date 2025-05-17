@@ -265,14 +265,14 @@
                             <a href="/list" class="btn btn-outline-secondary px-4 d-flex align-items-center justify-content-center">취소</a>
                             <button type="submit" class="btn btn-primary btn-submit d-flex align-items-center justify-content-center">등록하기</button>
                         </div>
-                    </form>
+</form>
                 </div>
             </div>
         </div>
     </th:block>
 
     <th:block th:fragment="customJs">
-        <script>
+<script>
             // 폼 유효성 검사
             (function () {
                 'use strict'
@@ -349,11 +349,11 @@
 
                         // 파일 업로드
                         const uploadResult = await fetch(uploadUrl, {
-                            method: 'PUT',
-                            body: file
-                        });
+            method: 'PUT',
+            body: file
+        });
 
-                        if (uploadResult.ok) {
+        if (uploadResult.ok) {
                             const imageUrl = uploadUrl.split("?")[0];
                             
                             // 미리보기 업데이트
@@ -368,7 +368,7 @@
                             
                             // 숨겨진 입력 필드 업데이트
                             document.getElementById('img').value = imageUrl;
-                        } else {
+        } else {
                             throw new Error('이미지 업로드 실패');
                         }
                     } catch (error) {
@@ -400,8 +400,8 @@
                 imageInput.value = '';
                 // 이미지 URL 입력 초기화
                 imgUrlInput.value = '';
-            }
-        </script>
+    }
+</script>
     </th:block>
 </body>
 </html>
