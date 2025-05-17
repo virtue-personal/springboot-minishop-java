@@ -9,27 +9,22 @@
             .mypage-wrapper {
                 padding: 3rem 0;
                 min-height: calc(100vh - 72px);
-                display: flex;
-                align-items: center;
-                justify-content: center;
             }
 
             .profile-section {
                 background-color: var(--bs-body-bg);
                 border-radius: 1rem;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
                 padding: 2.5rem;
                 width: 100%;
-                max-width: 500px;
                 text-align: center;
-                margin-bottom: 1.5rem;
+                margin-bottom: 2rem;
             }
 
             .profile-image {
                 width: 100px;
                 height: 100px;
                 border-radius: 50%;
-                background-color: var(--bs-primary);
+                background-color: var(--bs-primary-bg-subtle);
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -38,28 +33,126 @@
 
             .profile-image i {
                 font-size: 3rem;
-                color: white;
+                color: var(--bs-primary);
             }
 
             .profile-info h2 {
                 margin: 0;
                 font-size: 1.75rem;
-                font-weight: 700;
+                font-weight: 600;
                 color: var(--bs-body-color);
             }
 
             .profile-info p {
                 margin: 0.75rem 0 0 0;
-                color: var(--bs-secondary);
+                color: var(--bs-secondary-color);
                 font-size: 1.1rem;
             }
 
-            .content-wrapper {
+            .orders-section {
+                background-color: var(--bs-body-bg);
+                border-radius: 1rem;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                padding: 2rem;
                 width: 100%;
-                max-width: 500px;
+                margin-bottom: 2rem;
+            }
+
+            .orders-title {
+                font-size: 1.5rem;
+                font-weight: 600;
+                margin-bottom: 1.5rem;
+                color: var(--bs-body-color);
+            }
+
+            .order-item {
+                border: 1px solid var(--bs-border-color);
+                border-radius: 8px;
+                padding: 1rem;
+                margin-bottom: 1rem;
+                background-color: var(--bs-body-bg);
+                box-shadow: 0 2px 4px rgba(var(--bs-body-color-rgb), 0.05);
+            }
+
+            .order-header {
                 display: flex;
-                flex-direction: column;
-                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 0.5rem;
+                color: var(--bs-secondary-color);
+                font-size: 0.9rem;
+            }
+
+            .order-content {
+                display: flex;
+                gap: 1rem;
+                margin: 1rem 0;
+            }
+
+            .order-image {
+                width: 100px;
+                height: 100px;
+                object-fit: cover;
+                border-radius: 4px;
+                background-color: var(--bs-secondary-bg);
+            }
+
+            .order-details {
+                flex: 1;
+            }
+
+            .order-title {
+                font-size: 1.1rem;
+                margin-bottom: 0.75rem;
+                color: var(--bs-body-color);
+            }
+
+            .order-quantity {
+                color: var(--bs-secondary-color);
+                font-size: 0.95rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .order-price {
+                color: var(--bs-primary);
+                font-weight: 600;
+                font-size: 1.1rem;
+            }
+
+            .order-status {
+                padding: 0.25rem 0.75rem;
+                border-radius: 20px;
+                font-size: 0.9rem;
+            }
+
+            .status-pending {
+                background-color: var(--bs-warning-bg-subtle);
+                color: var(--bs-warning-text-emphasis);
+                cursor: pointer;
+            }
+
+            .status-pending:hover {
+                opacity: 0.8;
+            }
+
+            .status-completed {
+                background-color: var(--bs-success-bg-subtle);
+                color: var(--bs-success-text-emphasis);
+            }
+
+            .empty-orders {
+                text-align: center;
+                padding: 3rem 0;
+            }
+
+            .empty-orders i {
+                font-size: 3rem;
+                color: var(--bs-secondary);
+                margin-bottom: 1rem;
+            }
+
+            .empty-orders p {
+                color: var(--bs-secondary);
+                margin-bottom: 1.5rem;
             }
 
             .shop-button {
@@ -70,15 +163,124 @@
 
             .shop-button:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 4px 8px rgba(var(--bs-body-color-rgb), 0.1);
             }
 
-            [data-bs-theme="dark"] .profile-section {
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            .delete-order {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.875rem;
             }
 
-            [data-bs-theme="dark"] .shop-button:hover {
-                box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+            [data-bs-theme="dark"] .order-item {
+                border-color: var(--bs-border-color);
+                background-color: var(--bs-dark);
+            }
+
+            .order-footer {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-top: 1rem;
+            }
+
+            .order-actions {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .order-date {
+                color: var(--bs-secondary-color);
+                font-size: 0.9rem;
+            }
+
+            .order-id {
+                color: var(--bs-primary);
+                font-weight: 500;
+            }
+
+            .bank-info {
+                background: var(--bs-warning-bg-subtle);
+                padding: 1.5rem;
+                border-radius: 1rem;
+                margin: 1rem 0;
+                text-align: center;
+            }
+
+            .bank-info-title {
+                font-size: 1.2rem;
+                color: var(--bs-warning-text);
+                margin-bottom: 1rem;
+            }
+
+            .bank-account {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: var(--bs-warning-text);
+                margin-bottom: 0.5rem;
+            }
+
+            .bank-name {
+                color: var(--bs-warning-text-emphasis);
+                font-weight: 600;
+            }
+
+            .notice-text {
+                color: var(--bs-danger);
+                margin-top: 1rem;
+                font-size: 0.9rem;
+                text-align: center;
+            }
+
+            /* 모달 중앙 정렬 스타일 */
+            .modal-dialog {
+                display: flex;
+                align-items: center;
+                min-height: calc(100% - 1rem);
+            }
+
+            @media (min-width: 576px) {
+                .modal-dialog {
+                    min-height: calc(100% - 3.5rem);
+                }
+            }
+
+            /* 페이지네이션 스타일 */
+            .pagination-wrapper {
+                margin-top: 2rem;
+                display: flex;
+                justify-content: center;
+            }
+
+            .pagination {
+                display: flex;
+                gap: 0.5rem;
+            }
+
+            .page-item.active .page-link {
+                background-color: var(--bs-primary);
+                border-color: var(--bs-primary);
+            }
+
+            .page-link {
+                border-radius: 0.5rem;
+                padding: 0.5rem 1rem;
+                color: var(--bs-body-color);
+                border: 1px solid var(--bs-border-color);
+                background-color: var(--bs-body-bg);
+                transition: all 0.2s ease;
+            }
+
+            .page-link:hover {
+                background-color: var(--bs-primary-bg-subtle);
+                color: var(--bs-primary);
+                border-color: var(--bs-primary-border-subtle);
+            }
+
+            .page-item.disabled .page-link {
+                background-color: var(--bs-secondary-bg);
+                border-color: var(--bs-border-color);
+                color: var(--bs-secondary-color);
             }
         </style>
     </th:block>
@@ -86,24 +288,242 @@
 <body>
     <th:block th:fragment="content">
         <div class="mypage-wrapper">
-            <div class="content-wrapper">
-                <div class="profile-section">
-                    <div class="profile-image">
-                        <i class="bi bi-person-fill"></i>
-                    </div>
-                    <div class="profile-info">
-                        <h2 th:text="${#authentication.principal.displayName}">사용자명</h2>
-                        <p th:text="${#authentication.principal.username}">아이디</p>
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <!-- 프로필 섹션 -->
+                        <div class="profile-section">
+                            <div class="profile-image">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+                            <div class="profile-info">
+                                <h2 th:text="${#authentication.principal.displayName}">사용자명</h2>
+                                <p th:text="${#authentication.principal.username}">아이디</p>
+                            </div>
+                        </div>
+
+                        <!-- 주문 내역 섹션 -->
+                        <div class="orders-section">
+                            <h3 class="orders-title">
+                                <i class="bi bi-bag-check me-2"></i>주문 내역
+                            </h3>
+                            
+                            <!-- 주문 내역이 없을 때 -->
+                            <div th:if="${#lists.isEmpty(orders)}" class="empty-orders">
+                                <i class="bi bi-cart-x"></i>
+                                <p>아직 주문 내역이 없습니다</p>
+                                <a href="/list" class="btn btn-primary shop-button">
+                                    <i class="bi bi-shop me-2"></i>쇼핑하러 가기
+                                </a>
+                            </div>
+                            
+                            <!-- 주문 내역이 있을 때 -->
+                            <div th:if="${not #lists.isEmpty(orders)}">
+                                <div th:each="order : ${orders}" class="order-item">
+                                    <div class="order-header">
+                                        <span class="order-id" th:text="${'주문번호: ' + order.id}">
+                                            주문번호: 12345
+                                        </span>
+                                        <span class="order-status" 
+                                              th:with="isPending=${order.status == null || order.status.name() == 'PENDING'}"
+                                              th:classappend="${isPending ? 'status-pending' : 'status-completed'}"
+                                              th:text="${isPending ? '입금대기' : '주문완료'}"
+                                              th:data-order-id="${order.id}"
+                                              th:data-total-price="${order.price * order.count}"
+                                              th:data-is-pending="${isPending}">
+                                            입금대기
+                                        </span>
+                                    </div>
+                                    <div class="order-content">
+                                        <img th:src="${order.imgUrl != null and !order.imgUrl.isEmpty()} ? ${order.imgUrl} : 'https://placehold.co/300'"
+                                             class="order-image" th:alt="${order.title}">
+                                        <div class="order-details">
+                                            <h4 class="order-title" th:text="${order.title}">상품명</h4>
+                                            <p class="order-quantity" th:text="${order.count + '개'}">2개</p>
+                                            <p class="order-price" th:text="${#numbers.formatInteger(order.price * order.count, 0, 'COMMA') + '원'}">
+                                                50,000원
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="order-footer">
+                                        <span class="order-date" th:text="${#temporals.format(order.createdAt, 'yyyy.MM.dd HH:mm')}">
+                                            2024.02.14 15:30
+                                        </span>
+                                        <div class="order-actions">
+                                            <button class="btn btn-danger btn-sm delete-order"
+                                                    th:if="${order.status == null || order.status.name() == 'PENDING'}"
+                                                    th:data-order-id="${order.id}">
+                                                삭제
+                                            </button>
+                                            <span class="badge bg-success-subtle text-success" 
+                                                  th:if="${order.status != null && order.status.name() == 'COMPLETED'}">
+                                                <i class="bi bi-lock-fill me-1"></i>삭제불가
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 페이지네이션 -->
+                                <div class="pagination-wrapper" th:if="${totalPages > 1}">
+                                    <nav aria-label="주문 내역 페이지">
+                                        <ul class="pagination">
+                                            <!-- 이전 페이지 -->
+                                            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                                                <a class="page-link" 
+                                                   th:href="@{/mypage(page=${currentPage - 1})}"
+                                                   th:if="${currentPage > 1}">
+                                                    <i class="bi bi-chevron-left"></i>
+                                                </a>
+                                                <span class="page-link" th:unless="${currentPage > 1}">
+                                                    <i class="bi bi-chevron-left"></i>
+                                                </span>
+                                            </li>
+
+                                            <!-- 페이지 번호 -->
+                                            <li class="page-item" 
+                                                th:each="pageNum : ${#numbers.sequence(1, totalPages)}"
+                                                th:classappend="${pageNum == currentPage} ? 'active'">
+                                                <a class="page-link" 
+                                                   th:href="@{/mypage(page=${pageNum})}"
+                                                   th:text="${pageNum}">1</a>
+                                            </li>
+
+                                            <!-- 다음 페이지 -->
+                                            <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                                                <a class="page-link" 
+                                                   th:href="@{/mypage(page=${currentPage + 1})}"
+                                                   th:if="${currentPage < totalPages}">
+                                                    <i class="bi bi-chevron-right"></i>
+                                                </a>
+                                                <span class="page-link" th:unless="${currentPage < totalPages}">
+                                                    <i class="bi bi-chevron-right"></i>
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 입금하기 모달 -->
+                        <div class="modal fade" id="paymentModal" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">입금 안내</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="bank-info">
+                                            <div class="bank-info-title">입금 계좌 정보</div>
+                                            <div class="bank-name">KB국민은행</div>
+                                            <div class="bank-account">721801-01-670661</div>
+                                            <div class="total-price" id="modalTotalPrice"></div>
+                                        </div>
+                                        <p class="notice-text">* 주문 후 24시간 이내에 입금해 주시기 바랍니다.</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                                        <button type="button" class="btn btn-primary" onclick="confirmPayment()">
+                                            <i class="bi bi-check-circle me-2"></i>입금완료
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 쇼핑하기 버튼 -->
+                        <div class="text-center">
+                            <a href="/list" class="btn btn-primary shop-button">
+                                <i class="bi bi-shop me-2"></i>쇼핑하러 가기
+                            </a>
+                        </div>
                     </div>
                 </div>
-                <a href="/list" class="btn btn-primary shop-button">
-                    <i class="bi bi-shop me-2"></i>쇼핑하러 가기
-                </a>
             </div>
         </div>
     </th:block>
 
     <th:block th:fragment="customJs">
+    <script th:inline="javascript">
+    let currentOrderId = null;
+    const paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
+
+    function showPaymentModal(orderId, totalPrice) {
+        currentOrderId = orderId;
+        document.getElementById('modalTotalPrice').textContent = 
+            new Intl.NumberFormat('ko-KR').format(totalPrice) + '원';
+        paymentModal.show();
+    }
+
+    async function confirmPayment() {
+        if (!currentOrderId) return;
+
+        try {
+            const response = await fetch(`/order/${currentOrderId}/complete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                alert('입금확인이 완료되었습니다.');
+                location.reload();  // 페이지 새로고침하여 상태 업데이트 반영
+            } else {
+                const errorData = await response.text();
+                alert(errorData || '입금확인 처리 중 오류가 발생했습니다.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('입금확인 처리 중 오류가 발생했습니다.');
+        }
+
+        paymentModal.hide();
+    }
+
+    // 상태 클릭 이벤트 처리
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.order-status').forEach(status => {
+            status.addEventListener('click', function() {
+                const isPending = this.dataset.isPending === 'true';
+                if (!isPending) return;
+                
+                const orderId = this.dataset.orderId;
+                const totalPrice = parseInt(this.dataset.totalPrice);
+                showPaymentModal(orderId, totalPrice);
+            });
+        });
+
+        // 주문 삭제 기능
+        document.querySelectorAll('.delete-order').forEach(button => {
+            button.addEventListener('click', async function() {
+                if (!confirm('주문을 삭제하시겠습니까?\n삭제된 주문은 복구할 수 없습니다.')) return;
+                
+                const orderId = this.getAttribute('data-order-id');
+                try {
+                    const response = await fetch(`/sales/order/${orderId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        alert('주문이 삭제되었습니다.');
+                        location.reload();
+                    } else {
+                        const errorData = await response.text();
+                        alert(errorData || '주문 삭제 중 오류가 발생했습니다.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('주문 삭제 중 오류가 발생했습니다.');
+                }
+            });
+        });
+    });
+    </script>
     </th:block>
 </body>
 </html>
