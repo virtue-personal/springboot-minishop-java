@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+<html lang="ko" 
+      xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       th:replace="~{layouts/default :: layout(~{::title}, ~{::content}, ~{::customCss}, ~{::customJs})}">
 <head>
@@ -141,18 +142,34 @@
 
             .empty-orders {
                 text-align: center;
-                padding: 3rem 0;
+                padding: 4rem 2rem;
+                border-radius: 1rem;
             }
 
             .empty-orders i {
-                font-size: 3rem;
-                color: var(--bs-secondary);
+                font-size: 4rem;
+                color: var(--bs-secondary-color);
+                margin-bottom: 1.5rem;
+                display: block;
+            }
+
+            .empty-orders h3 {
+                font-size: 1.5rem;
+                color: var(--bs-body-color);
                 margin-bottom: 1rem;
+                font-weight: 600;
             }
 
             .empty-orders p {
-                color: var(--bs-secondary);
-                margin-bottom: 1.5rem;
+                color: var(--bs-secondary-color);
+                margin-bottom: 2rem;
+                font-size: 1.1rem;
+            }
+
+            .empty-orders .btn {
+                padding: 0.75rem 2rem;
+                font-size: 1.1rem;
+                min-width: 200px;
             }
 
             .shop-button {
@@ -309,16 +326,14 @@
                             </h3>
                             
                             <!-- 주문 내역이 없을 때 -->
-                            <div th:if="${#lists.isEmpty(orders)}" class="empty-orders">
+                            <div th:if="${orders.empty}" class="empty-orders">
                                 <i class="bi bi-cart-x"></i>
-                                <p>아직 주문 내역이 없습니다</p>
-                                <a href="/list" class="btn btn-primary shop-button">
-                                    <i class="bi bi-shop me-2"></i>쇼핑하러 가기
-                                </a>
+                                <h3>주문 내역이 텅 비었습니다!</h3>
+                                <p>지금 바로 상품을 구매해보세요</p>
                             </div>
                             
                             <!-- 주문 내역이 있을 때 -->
-                            <div th:if="${not #lists.isEmpty(orders)}">
+                            <div th:if="${not orders.empty}">
                                 <div th:each="order : ${orders}" class="order-item">
                                     <div class="order-header">
                                         <span class="order-id" th:text="${'주문번호: ' + order.id}">
@@ -406,12 +421,12 @@
                         </div>
 
                         <!-- 입금하기 모달 -->
-                        <div class="modal fade" id="paymentModal" tabindex="-1" aria-hidden="true">
+                        <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title">입금 안내</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        <h5 class="modal-title" id="paymentModalLabel">입금 안내</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
                                     </div>
                                     <div class="modal-body">
                                         <div class="bank-info">
@@ -433,7 +448,7 @@
                         </div>
 
                         <!-- 쇼핑하기 버튼 -->
-                        <div class="text-center">
+                        <div class="text-center mt-4">
                             <a href="/list" class="btn btn-primary shop-button">
                                 <i class="bi bi-shop me-2"></i>쇼핑하러 가기
                             </a>
@@ -445,85 +460,126 @@
     </th:block>
 
     <th:block th:fragment="customJs">
-    <script th:inline="javascript">
-    let currentOrderId = null;
-    const paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
+        <script th:inline="javascript">
+            // 서버에서 전달된 데이터
+            const orders = /*[[${orders.content}]]*/ [];
+            const totalPages = /*[[${totalPages}]]*/ 0;
+            const currentPage = /*[[${currentPage}]]*/ 1;
 
-    function showPaymentModal(orderId, totalPrice) {
-        currentOrderId = orderId;
-        document.getElementById('modalTotalPrice').textContent = 
-            new Intl.NumberFormat('ko-KR').format(totalPrice) + '원';
-        paymentModal.show();
-    }
-
-    async function confirmPayment() {
-        if (!currentOrderId) return;
-
-        try {
-            const response = await fetch(`/order/${currentOrderId}/complete`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
+            // 테마 적용 함수
+            function applyTheme() {
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme) {
+                    document.documentElement.setAttribute('data-bs-theme', savedTheme);
                 }
-            });
-
-            if (response.ok) {
-                alert('입금확인이 완료되었습니다.');
-                location.reload();  // 페이지 새로고침하여 상태 업데이트 반영
-            } else {
-                const errorData = await response.text();
-                alert(errorData || '입금확인 처리 중 오류가 발생했습니다.');
             }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('입금확인 처리 중 오류가 발생했습니다.');
-        }
 
-        paymentModal.hide();
-    }
+            // 페이지 로드 전 테마 적용
+            applyTheme();
 
-    // 상태 클릭 이벤트 처리
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.order-status').forEach(status => {
-            status.addEventListener('click', function() {
-                const isPending = this.dataset.isPending === 'true';
-                if (!isPending) return;
+            // DOM 로드 완료 후 실행
+            document.addEventListener('DOMContentLoaded', function() {
+                // 테마 재적용
+                applyTheme();
                 
-                const orderId = this.dataset.orderId;
-                const totalPrice = parseInt(this.dataset.totalPrice);
-                showPaymentModal(orderId, totalPrice);
+                // 테마 변경 이벤트 리스너
+                window.addEventListener('storage', function(e) {
+                    if (e.key === 'theme') {
+                        applyTheme();
+                    }
+                });
             });
-        });
 
-        // 주문 삭제 기능
-        document.querySelectorAll('.delete-order').forEach(button => {
-            button.addEventListener('click', async function() {
-                if (!confirm('주문을 삭제하시겠습니까?\n삭제된 주문은 복구할 수 없습니다.')) return;
-                
-                const orderId = this.getAttribute('data-order-id');
+            // 입금 모달 설정
+            const paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'), {
+                keyboard: true,
+                backdrop: true,
+                focus: true
+            });
+
+            let currentOrderId = null;
+
+            // 입금 모달 표시 함수
+            function showPaymentModal(orderId, totalPrice) {
+                currentOrderId = orderId;
+                const formattedPrice = new Intl.NumberFormat('ko-KR').format(totalPrice) + '원';
+                document.getElementById('modalTotalPrice').textContent = formattedPrice;
+                paymentModal.show();
+            }
+
+            // 입금 확인 처리 함수
+            async function confirmPayment() {
+                if (!currentOrderId) return;
+
                 try {
-                    const response = await fetch(`/sales/order/${orderId}`, {
-                        method: 'DELETE',
+                    const response = await fetch(`/order/${currentOrderId}/complete`, {
+                        method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
                         }
                     });
                     
                     if (response.ok) {
-                        alert('주문이 삭제되었습니다.');
+                        alert('입금확인이 완료되었습니다.');
                         location.reload();
                     } else {
                         const errorData = await response.text();
-                        alert(errorData || '주문 삭제 중 오류가 발생했습니다.');
+                        alert(errorData || '입금확인 처리 중 오류가 발생했습니다.');
                     }
                 } catch (error) {
-                    console.error('Error:', error);
-                    alert('주문 삭제 중 오류가 발생했습니다.');
+                    console.error('입금 확인 에러:', error);
+                    alert('입금확인 처리 중 오류가 발생했습니다.');
+                } finally {
+                    paymentModal.hide();
                 }
+            }
+
+            // 이벤트 리스너 등록
+            document.addEventListener('DOMContentLoaded', function() {
+                // 주문 삭제 버튼 이벤트
+                document.querySelectorAll('.delete-order').forEach(button => {
+                    button.addEventListener('click', async function() {
+                        const orderId = this.getAttribute('data-order-id');
+                        if (!orderId) return;
+
+                        if (!confirm('주문을 삭제하시겠습니까?\n삭제된 주문은 복구할 수 없습니다.')) {
+                            return;
+                        }
+                        
+                        try {
+                            const response = await fetch(`/order/${orderId}`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                }
+                            });
+
+                            if (response.ok) {
+                                alert('주문이 삭제되었습니다.');
+                                location.reload();
+                            } else {
+                                const errorData = await response.text();
+                                alert(errorData || '주문 삭제 중 오류가 발생했습니다.');
+                            }
+                        } catch (error) {
+                            console.error('주문 삭제 에러:', error);
+                            alert('주문 삭제 중 오류가 발생했습니다.');
+                        }
+                    });
+                });
+
+                // 입금대기 상태 클릭 이벤트
+                document.querySelectorAll('.status-pending').forEach(status => {
+                    status.addEventListener('click', function() {
+                        const orderId = this.getAttribute('data-order-id');
+                        const totalPrice = this.getAttribute('data-total-price');
+                        if (orderId && totalPrice) {
+                            showPaymentModal(orderId, totalPrice);
+                        }
+                    });
+                });
             });
-        });
-    });
-    </script>
+        </script>
     </th:block>
 </body>
 </html>
