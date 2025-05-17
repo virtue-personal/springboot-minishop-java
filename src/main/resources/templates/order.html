@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layouts/default :: layout(~{::title}, ~{::content}, ~{::customCss}, ~{::customJs})}">
+<head>
+    <title>주문하기 - 쇼핑몰</title>
+    <th:block th:fragment="customCss">
+        <style>
+            .order-wrapper {
+                padding: 2rem 0;
+                min-height: calc(100vh - 72px);
+            }
+
+            .order-form {
+                max-width: 600px;
+                margin: 0 auto;
+                background-color: var(--bs-body-bg);
+                border-radius: 1rem;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                padding: 2rem;
+            }
+
+            .order-title {
+                font-size: 1.5rem;
+                font-weight: 700;
+                margin-bottom: 2rem;
+                text-align: center;
+            }
+
+            .form-label {
+                font-weight: 600;
+            }
+
+            .price-display {
+                font-size: 1.25rem;
+                font-weight: 700;
+                color: var(--bs-primary);
+                text-align: right;
+                margin-top: 1rem;
+            }
+
+            .btn-order {
+                width: 100%;
+                padding: 0.75rem;
+                font-weight: 600;
+                margin-top: 2rem;
+            }
+
+            .product-image {
+                width: 100%;
+                height: 200px;
+                object-fit: cover;
+                border-radius: 0.5rem;
+                margin-bottom: 1.5rem;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+    <th:block th:fragment="content">
+        <div class="order-wrapper">
+            <div class="container">
+                <form action="/order" method="post" class="order-form">
+                    <h2 class="order-title">주문 정보</h2>
+                    
+                    <input type="hidden" name="itemId" th:value="${item.id}">
+                    
+                    <img th:if="${item.imgUrl != null and !item.imgUrl.isEmpty()}"
+                         th:src="${item.imgUrl}"
+                         class="product-image"
+                         th:alt="${item.title}">
+                    
+                    <div class="mb-3">
+                        <label for="title" class="form-label">상품명</label>
+                        <input type="text" class="form-control" id="title" 
+                               th:value="${item.title}" readonly>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="price" class="form-label">가격</label>
+                        <input type="text" class="form-control" id="price"
+                               th:value="${#numbers.formatInteger(item.price, 0, 'COMMA') + '원'}" readonly>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="count" class="form-label">수량</label>
+                        <div class="input-group">
+                            <button type="button" class="btn btn-outline-secondary" onclick="decreaseCount()">-</button>
+                            <input type="number" class="form-control text-center" id="count" name="count" 
+                                   value="1" min="1" max="100" onchange="updateTotal()">
+                            <button type="button" class="btn btn-outline-secondary" onclick="increaseCount()">+</button>
+                        </div>
+                    </div>
+
+                    <div class="price-display">
+                        총 금액: <span id="totalPrice">0</span>원
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-order">
+                        <i class="bi bi-cart-check me-2"></i>주문하기
+                    </button>
+                </form>
+            </div>
+        </div>
+    </th:block>
+
+    <th:block th:fragment="customJs">
+        <script th:inline="javascript">
+            const price = [[${item.price}]];
+            
+            function updateTotal() {
+                const count = document.getElementById('count').value;
+                const total = price * count;
+                document.getElementById('totalPrice').textContent = 
+                    new Intl.NumberFormat('ko-KR').format(total);
+            }
+
+            function decreaseCount() {
+                const input = document.getElementById('count');
+                if (input.value > 1) {
+                    input.value = parseInt(input.value) - 1;
+                    updateTotal();
+                }
+            }
+
+            function increaseCount() {
+                const input = document.getElementById('count');
+                if (input.value < 100) {
+                    input.value = parseInt(input.value) + 1;
+                    updateTotal();
+                }
+            }
+
+            // 초기 총액 계산
+            document.addEventListener('DOMContentLoaded', updateTotal);
+        </script>
+    </th:block>
+</body>
+</html> 
