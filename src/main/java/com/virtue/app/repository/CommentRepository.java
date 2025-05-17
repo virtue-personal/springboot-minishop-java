@@ -1,5 +1,6 @@
-package com.virtue.springbootweb.comment;
+package com.virtue.app.repository;
 
+import com.virtue.app.domain.Comment;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.virtue.app.common.config;
+package com.virtue.app.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

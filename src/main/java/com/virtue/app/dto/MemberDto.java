@@ -1,4 +1,4 @@
-package com.virtue.app.user.dto;
+package com.virtue.app.dto;
 
 public class MemberDto {
     public String username;

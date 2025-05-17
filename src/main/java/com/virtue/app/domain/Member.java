@@ -1,4 +1,4 @@
-package com.virtue.app.user.domain;
+package com.virtue.app.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;

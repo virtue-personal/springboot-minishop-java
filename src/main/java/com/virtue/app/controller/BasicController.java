@@ -1,4 +1,4 @@
-package com.virtue.app.common;
+package com.virtue.app.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

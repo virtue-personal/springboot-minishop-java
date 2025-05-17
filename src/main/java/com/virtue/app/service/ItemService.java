@@ -1,5 +1,7 @@
-package com.virtue.springbootweb.item;
+package com.virtue.app.service;
 
+import com.virtue.app.domain.Item;
+import com.virtue.app.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

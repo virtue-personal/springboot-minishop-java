@@ -1,4 +1,4 @@
-package com.virtue.springbootweb.item;
+package com.virtue.app.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -9,6 +9,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
+@Table(indexes = @Index(columnList = "title", name = "작명"))
 public class Item {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

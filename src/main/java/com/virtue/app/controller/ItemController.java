@@ -1,6 +1,10 @@
-package com.virtue.springbootweb.item;
+package com.virtue.app.controller;
 
-import com.virtue.springbootweb.comment.CommentRepository;
+import com.virtue.app.repository.CommentRepository;
+import com.virtue.app.service.S3Service;
+import com.virtue.app.repository.ItemRepository;
+import com.virtue.app.service.ItemService;
+import com.virtue.app.domain.Item;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -119,5 +123,13 @@ public class ItemController {
     String test(@RequestBody Map<String, Object> body) {
         System.out.println(body.get("name"));
         return "redirect:/list";
+    }
+
+    @PostMapping("/search")
+    public String postSearch(@RequestParam String searchText) {
+
+//        var result = itemRepository.rawQuery1(searchText);
+//        System.out.println(result);
+        return "list";
     }
 }

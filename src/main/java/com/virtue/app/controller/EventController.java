@@ -1,5 +1,7 @@
-package com.virtue.springbootweb.event;
+package com.virtue.app.controller;
 
+import com.virtue.app.domain.Event;
+import com.virtue.app.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

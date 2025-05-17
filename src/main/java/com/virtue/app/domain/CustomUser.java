@@ -1,4 +1,4 @@
-package com.virtue.app.common;
+package com.virtue.app.domain;
 
 
 import org.springframework.security.core.GrantedAuthority;

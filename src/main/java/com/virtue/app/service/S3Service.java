@@ -1,4 +1,4 @@
-package com.virtue.app.common.util;
+package com.virtue.app.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,9 +1,9 @@
-package com.virtue.app.user.controller;
+package com.virtue.app.controller;
 
-import com.virtue.app.common.CustomUser;
-import com.virtue.app.user.dto.MemberDto;
-import com.virtue.app.user.repository.MemberRepository;
-import com.virtue.app.user.service.MemberService;
+import com.virtue.app.domain.CustomUser;
+import com.virtue.app.dto.MemberDto;
+import com.virtue.app.repository.MemberRepository;
+import com.virtue.app.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;

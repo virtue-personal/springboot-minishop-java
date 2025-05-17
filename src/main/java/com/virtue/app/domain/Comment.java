@@ -1,6 +1,6 @@
-package com.virtue.springbootweb.comment;
+package com.virtue.app.domain;
 
-import com.virtue.springbootweb.item.Item;
+import com.virtue.app.domain.Item;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
