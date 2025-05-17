@@ -16,6 +16,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import lombok.Getter;
+import lombok.AllArgsConstructor;
+import java.time.LocalDateTime;
 
 import java.util.List;
 
@@ -65,9 +68,20 @@ public class MemberController {
         PageRequest pageRequest = PageRequest.of(page - 1, 5, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Sales> ordersPage = salesRepository.findByMember(member, pageRequest);
         
-        model.addAttribute("orders", ordersPage);
+        // DTO로 변환
+        Page<OrderDto> orderDtos = ordersPage.map(order -> new OrderDto(
+            order.getId(),
+            order.getTitle(),
+            order.getPrice(),
+            order.getCount(),
+            order.getImgUrl(),
+            order.getStatus(),
+            order.getCreatedAt()
+        ));
+        
+        model.addAttribute("orders", orderDtos);
         model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", ordersPage.getTotalPages());
+        model.addAttribute("totalPages", orderDtos.getTotalPages());
         
         return "mypage";
     }
@@ -97,6 +111,19 @@ public class MemberController {
         var data = new MemberDto(result.getUsername(), result.getDisplayName());
 
         return data;
+    }
+
+    // DTO 클래스 추가
+    @Getter
+    @AllArgsConstructor
+    public static class OrderDto {
+        private Long id;
+        private String title;
+        private Integer price;
+        private Integer count;
+        private String imgUrl;
+        private Sales.OrderStatus status;
+        private LocalDateTime createdAt;
     }
 }
 

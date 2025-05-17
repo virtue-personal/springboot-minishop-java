@@ -66,12 +66,19 @@ public class SalesController {
                 return ResponseEntity.status(403).body("권한이 없습니다.");
             }
             
+            // 주문 상태 확인
+            if (order.getStatus() == Sales.OrderStatus.COMPLETED) {
+                return ResponseEntity.badRequest().body("이미 입금이 완료된 주문입니다.");
+            }
+            
             // 주문 상태 변경
             salesService.updateOrderStatus(orderId, Sales.OrderStatus.COMPLETED);
             
             return ResponseEntity.ok("입금확인이 완료되었습니다.");
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("서버 오류가 발생했습니다.");
         }
     }
 
