@@ -26,6 +26,11 @@ spring:
       s3:
         bucket: ${AWS_S3_BUCKET}
 
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
 server:
   error:
     path: /error
