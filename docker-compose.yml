@@ -1,7 +1,7 @@
 services:
   springboot:
-    image: yt-codingapple-springbootweb
-    container_name: yt-codingapple-springbootweb
+    image: minishop
+    container_name: minishop
     build:
       context: .
       dockerfile: Dockerfile

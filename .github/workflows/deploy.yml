@@ -21,7 +21,7 @@ jobs:
           key: ${{ secrets.AWS_SSH_KEY }}
           port: 22
           source: "."
-          target: "/home/ec2-user/yt_codingapple_springbootweb"
+          target: "/home/ec2-user/minishop"
           rm: true
           strip_components: 1
           exclude: |
@@ -38,7 +38,7 @@ jobs:
           key: ${{ secrets.AWS_SSH_KEY }}
           port: 22
           script: |
-            cd /home/ec2-user/yt_codingapple_springbootweb
+            cd /home/ec2-user/minishop
             echo "${{ secrets.ENV }}" | base64 --decode > .env
             echo ".env created"
 
@@ -50,7 +50,7 @@ jobs:
           key: ${{ secrets.AWS_SSH_KEY }}
           port: 22
           script: |
-            cd /home/ec2-user/yt_codingapple_springbootweb
+            cd /home/ec2-user/minishop
             docker-compose down || true
             docker-compose --env-file .env up -d --build
             echo "Deployment complete!"
