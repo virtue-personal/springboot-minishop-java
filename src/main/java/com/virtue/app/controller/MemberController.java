@@ -1,16 +1,9 @@
 package com.virtue.app.controller;
 
-import com.virtue.app.domain.Member;
-import com.virtue.app.domain.Sales;
-import com.virtue.app.dto.MemberDto;
 import com.virtue.app.dto.OrderDto;
-import com.virtue.app.repository.MemberRepository;
-import com.virtue.app.repository.SalesRepository;
 import com.virtue.app.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -22,14 +15,18 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
 
     private final MemberService memberService;
-    private final MemberRepository memberRepository;
-    private final SalesRepository salesRepository;
 
+    /**
+     * 회원가입 폼 페이지 반환
+     */
     @GetMapping("/register")
-    public String register(Model model) {
+    public String register() {
         return "register";
     }
 
+    /**
+     * 회원가입 처리
+     */
     @PostMapping("/register")
     public String register(String username, String password, String displayName, Model model) {
         try {
@@ -43,71 +40,42 @@ public class MemberController {
         }
     }
 
+    /**
+     * 로그인 페이지 반환
+     */
     @GetMapping("/login")
-    public String login(
-            @RequestParam(value = "error", required = false) String error,
-            @RequestParam(value = "exception", required = false) String exception,
-            Model model) {
+    public String login() {
         return "login";
     }
 
+    /**
+     * 마이페이지 - 주문 목록 조회
+     */
     @GetMapping("/mypage")
     public String myPage(
             @RequestParam(defaultValue = "1") int page,
-            Authentication auth, 
+            Authentication auth,
             Model model) {
-        Member member = memberRepository.findByUsername(auth.getName())
-                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
-        
-        // 페이징 처리 (최근 주문순)
-        PageRequest pageRequest = PageRequest.of(page - 1, 5, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Sales> ordersPage = salesRepository.findByMember(member, pageRequest);
-        
-        // DTO로 변환
-        Page<OrderDto> orderDtos = ordersPage.map(order -> new OrderDto(
-            order.getId(),
-            order.getTitle(),
-            order.getPrice(),
-            order.getCount(),
-            order.getImgUrl(),
-            order.getStatus(),
-            order.getCreatedAt()
-        ));
-        
+
+        Page<OrderDto> orderDtos = memberService.getOrderListForMyPage(auth.getName(), page);
         model.addAttribute("orders", orderDtos);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", orderDtos.getTotalPages());
-        
         return "mypage";
     }
 
+    /**
+     * 주문 삭제 요청 처리
+     */
     @DeleteMapping("/order/{orderId}")
     @ResponseBody
     public ResponseEntity<String> deleteOrder(@PathVariable Long orderId, Authentication auth) {
-        Member member = memberRepository.findByUsername(auth.getName())
-                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
-        
-        Sales order = salesRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다."));
-        
-        if (!order.getMember().getId().equals(member.getId())) {
+        boolean deleted = memberService.deleteOrder(auth.getName(), orderId);
+        if (deleted) {
+            return ResponseEntity.ok("주문이 삭제되었습니다.");
+        } else {
             return ResponseEntity.status(403).body("권한이 없습니다.");
         }
-        
-        salesRepository.deleteById(orderId);
-        return ResponseEntity.ok("주문이 삭제되었습니다.");
-    }
-
-    @GetMapping("/user/1")
-    @ResponseBody
-    public MemberDto getUser() {
-        var a = memberRepository.findById(1L);
-        var result = a.get();
-        var data = new MemberDto(result.getUsername(), result.getDisplayName());
-
-        return data;
     }
 
 }
-
-
