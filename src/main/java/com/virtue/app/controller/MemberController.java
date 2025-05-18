@@ -3,11 +3,10 @@ package com.virtue.app.controller;
 import com.virtue.app.domain.Member;
 import com.virtue.app.domain.Sales;
 import com.virtue.app.dto.MemberDto;
+import com.virtue.app.dto.OrderDto;
 import com.virtue.app.repository.MemberRepository;
 import com.virtue.app.repository.SalesRepository;
 import com.virtue.app.service.MemberService;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,8 +16,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
 
 @Controller
 @RequiredArgsConstructor
@@ -111,18 +108,6 @@ public class MemberController {
         return data;
     }
 
-    // DTO 클래스 추가
-    @Getter
-    @AllArgsConstructor
-    public static class OrderDto {
-        private Long id;
-        private String title;
-        private Integer price;
-        private Integer count;
-        private String imgUrl;
-        private Sales.OrderStatus status;
-        private LocalDateTime createdAt;
-    }
 }
 
 
