@@ -1,14 +1,10 @@
 package com.virtue.app.controller;
 
 import com.virtue.app.domain.Item;
-import com.virtue.app.repository.CommentRepository;
-import com.virtue.app.repository.ItemRepository;
 import com.virtue.app.service.ItemService;
 import com.virtue.app.service.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -16,147 +12,156 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
 public class ItemController {
 
-    private final ItemRepository itemRepository;
     private final ItemService itemService;
     private final S3Service s3Service;
-    private final CommentRepository commentRepository;
 
+    /**
+     * 리스트 첫 페이지로 리디렉션
+     */
     @GetMapping("/list")
-    String listRedirect() {
+    public String listRedirect() {
         return "redirect:/list/1";
     }
 
+    /**
+     * 상품 목록 페이지 조회
+     */
     @GetMapping("/list/{pageNum}")
-    String getListPage(Model model, 
-                      @PathVariable Integer pageNum,
-                      @RequestParam(required = false, defaultValue = "desc") String sort,
-                      @RequestParam(required = false) String searchText) {
-        Sort.Direction direction = sort.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
-        PageRequest pageRequest = PageRequest.of(pageNum - 1, 6, Sort.by(direction, "id"));
-        
-        Page<Item> result;
-        if (searchText != null && !searchText.trim().isEmpty()) {
-            result = itemRepository.searchByTitleWithPaging(searchText.trim(), pageRequest);
-        } else {
-            result = itemRepository.findPageBy(pageRequest);
-        }
-
+    public String getListPage(Model model,
+                              @PathVariable Integer pageNum,
+                              @RequestParam(defaultValue = "desc") String sort,
+                              @RequestParam(required = false) String searchText) {
+        Page<Item> result = itemService.getItemPage(pageNum, sort, searchText);
         model.addAttribute("items", result);
         model.addAttribute("currentSort", sort);
         model.addAttribute("searchText", searchText);
         return "list";
     }
 
+    /**
+     * 상품 작성 페이지 반환
+     */
     @GetMapping("/write")
     @PreAuthorize("isAuthenticated()")
-    String writePage() {
+    public String writePage() {
         return "write.html";
     }
 
+    /**
+     * 상품 작성 처리
+     */
     @PostMapping("/write")
     @PreAuthorize("isAuthenticated()")
-    String writeItem(@RequestParam String title,
-                    @RequestParam Integer price,
-                    @RequestParam(required = false) String img) {
-        Item item = new Item();
-        item.setTitle(title);
-        item.setPrice(price);
-        item.setImgUrl(img);
-        
-        itemRepository.save(item);
+    public String writeItem(@RequestParam String title,
+                            @RequestParam Integer price,
+                            @RequestParam(required = false) String img) {
+        itemService.saveItem(title, price, img);
         return "redirect:/list";
     }
 
+    /**
+     * 상품 상세 페이지 반환
+     */
     @GetMapping("/detail/{id}")
-    String detail(@PathVariable Long id, 
-                 @RequestParam(required = false, defaultValue = "1") Integer page,
-                 @RequestParam(required = false, defaultValue = "desc") String sort,
-                 Model model) {
-        Optional<Item> result = itemRepository.findById(id);
-        if (result.isPresent()) {
-            model.addAttribute("data", result.get());
-            model.addAttribute("page", page);
-            model.addAttribute("sort", sort);
-            model.addAttribute("comments", commentRepository.findByItemIdOrderByCreatedAtDesc(id));
-            return "detail.html";
-        } else {
-            return "redirect:/list";
-        }
+    public String detail(@PathVariable Long id,
+                         @RequestParam(defaultValue = "1") Integer page,
+                         @RequestParam(defaultValue = "desc") String sort,
+                         Model model) {
+
+        var detail = itemService.getItemDetail(id);
+        if (detail.isEmpty()) return "redirect:/list";
+
+        Map<String, Object> detailMap = detail.get();
+        model.addAttribute("data", detailMap.get("item"));
+        model.addAttribute("comments", detailMap.get("comments"));
+        model.addAttribute("page", page);
+        model.addAttribute("sort", sort);
+        return "detail.html";
     }
 
+    /**
+     * 상품 수정 페이지 반환
+     */
     @GetMapping("/edit/{id}")
     @PreAuthorize("isAuthenticated()")
-    String edit(Model model, @PathVariable Long id) {
-        Optional<Item> result = itemRepository.findById(id);
-        if (result.isPresent()) {
-            model.addAttribute("data", result.get());
-            return "edit.html";
-        } else {
-            return "redirect:/list";
-        }
+    public String edit(@PathVariable Long id, Model model) {
+        return itemService.getEditPageData(id)
+                .map(item -> {
+                    model.addAttribute("data", item);
+                    return "edit.html";
+                })
+                .orElse("redirect:/list");
     }
 
+    /**
+     * 상품 수정 처리
+     */
     @PostMapping("/edit")
     @PreAuthorize("isAuthenticated()")
-    String editItem(@RequestParam Long id,
-                    @RequestParam String title,
-                    @RequestParam Integer price,
-                    @RequestParam(required = false) String img) {
+    public String editItem(@RequestParam Long id,
+                           @RequestParam String title,
+                           @RequestParam Integer price,
+                           @RequestParam(required = false) String img) {
         itemService.editItem(id, title, price, img);
         return "redirect:/list";
     }
 
+    /**
+     * 상품 삭제 처리
+     */
     @DeleteMapping("/item")
     @PreAuthorize("isAuthenticated()")
-    ResponseEntity<String> deleteItem(@RequestParam Long id) {
-        itemRepository.deleteById(id);
-        return ResponseEntity.status(200).body("삭제완료");
+    public ResponseEntity<String> deleteItem(@RequestParam Long id) {
+        itemService.deleteItem(id);
+        return ResponseEntity.ok("삭제완료");
     }
 
+    /**
+     * Presigned URL 발급
+     */
     @GetMapping("/presigned-url")
     @ResponseBody
-    String getURL(@RequestParam String filename) {
-        var result = s3Service.createPresignedUrl("test/" + filename);
-        System.out.println(result);
-        return result;
+    public String getURL(@RequestParam String filename) {
+        return s3Service.createPresignedUrl("test/" + filename);
     }
 
+    /**
+     * 테스트용 바디 수신
+     */
     @PostMapping("/test1")
-    String test(@RequestBody Map<String, Object> body) {
+    public String test(@RequestBody Map<String, Object> body) {
         System.out.println(body.get("name"));
         return "redirect:/list";
     }
 
+    /**
+     * 상품 검색 처리 (POST 방식)
+     */
     @PostMapping("/search")
-    String search(@RequestParam String searchText,
-                 @RequestParam(required = false, defaultValue = "1") Integer page,
-                 @RequestParam(required = false, defaultValue = "desc") String sort,
-                 Model model) {
-        
-        Sort.Direction direction = sort.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
-        PageRequest pageRequest = PageRequest.of(page - 1, 6, Sort.by(direction, "id"));
-        
-        Page<Item> result = itemRepository.searchByTitleWithPaging(searchText.trim(), pageRequest);
-        
+    public String search(@RequestParam String searchText,
+                         @RequestParam(defaultValue = "1") Integer page,
+                         @RequestParam(defaultValue = "desc") String sort,
+                         Model model) {
+        Page<Item> result = itemService.searchItems(searchText, page, sort);
         model.addAttribute("items", result);
         model.addAttribute("currentSort", sort);
         model.addAttribute("searchText", searchText);
-        
         return "search-result";
     }
 
+    /**
+     * 상품 검색 페이지 (GET 방식)
+     */
     @GetMapping("/search")
-    String searchPage(@RequestParam String searchText,
-                     @RequestParam(required = false, defaultValue = "1") Integer page,
-                     @RequestParam(required = false, defaultValue = "desc") String sort,
-                     Model model) {
-        
+    public String searchPage(@RequestParam String searchText,
+                             @RequestParam(defaultValue = "1") Integer page,
+                             @RequestParam(defaultValue = "desc") String sort,
+                             Model model) {
         return search(searchText, page, sort, model);
     }
 }
